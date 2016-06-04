@@ -84,6 +84,7 @@ workshop ()
 					else
 						return 127
 					fi
+
 					if sh -n "${_found_module}" >/dev/null 2>&1
 					then
 						:
