@@ -6,7 +6,7 @@ workshop ()
 	_executable_dir="$(dirname "${_executable}")"
 	_input="${2##*-}"
 	_main="$(basename "${_input}")"
-	_from='https://raw.githubusercontent.com/alganet/workshop/master/'
+	_server='https://raw.githubusercontent.com/alganet/workshop/master/'
 	shift 2
 
 	set -euf
@@ -66,26 +66,28 @@ workshop ()
 			IFS="${_ifs}"
 			unset _ifs
 
-			if test -z "${_found_module:-}" && test ! -z "${_from:-}"
+			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
-				_remote_url="${_from}${_dependency}"
+				_remote_url="${_server}${_dependency}"
 				_found_module="${PWD}/${_dependency}"
 				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
 				if command -v workshop >/dev/null 2>&1
 				then
 					if command -v curl
 					then
-						curl -L "${_remote_url}" \
-							2>/dev/null > "${_found_module}"
+						curl --fail -L "${_remote_url}" \
+							2>/dev/null > "${_found_module}" || _code=$?
 					elif command -v wget
 					then
 						wget -qO- "${_remote_url}" \
-							2>/dev/null  > "${_found_module}"
+							2>/dev/null  > "${_found_module}" || _code=$?
 					else
 						return 127
 					fi
 
-					if sh -n "${_found_module}" >/dev/null 2>&1
+					if test "$(head -n1 "${_found_module}")" = "#!/usr/bin/env workshop" &&
+						test "${_code:-0}" = 0 &&
+						sh -n "${_found_module}" >/dev/null 2>&1 &&
 					then
 						:
 					else
@@ -98,19 +100,13 @@ workshop ()
 			fi
 
 			_required=''
-			_from=''
-
-			from ()
-			{
-				_from="${1:-}"
-			}
 
 			require ()
 			{
 				_required="${_required:-} ${*:-} "
 			}
 
-			sh -n "${_found_module}" >/dev/null 2>&1 || return 1
+			sh -n "${_found_module}" >/dev/null 2>&1
 
 			. "${_found_module}"
 
