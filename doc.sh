@@ -55,6 +55,7 @@ doc_command_get ()
 doc_parse () {
 	doc_sed_line="sed -n"
 	doc_sed="$(doc_parser_build ${doc_prefix})"
+	printf %s "${doc_sed}" > sed.sed
 	if [ -f "${doc_parser}" ]
 	then
 		doc_sed_line="sed -n -f"
@@ -182,7 +183,7 @@ doc_parser_build () {
 		p
 		$ { b endoutput }
 		N
-		s/^.*\\
+		s/^.*\
 		//
 
 	:_identify_line
@@ -359,9 +360,9 @@ doc_parser_build () {
 
 		N
 
-		/\\
+		/\
 		/ {
-			s/^\\
+			s/^\
 			//
 			${doc_indent} {
 				i \\
@@ -374,7 +375,7 @@ doc_parser_build () {
 				b _code_indented
 			}
 		}
-		s/^${d_anything}\\
+		s/^${d_anything}\
 		${d_anything}$/\2/
 		${doc_indent} { b _code_indented }
 		${d_empty_line} { b _code_indented }
