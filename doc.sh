@@ -213,8 +213,9 @@ doc_parser_build () {
 
 		/${d_prefix}\([${d_alnum}_]*\):/ {
 			s/_${d_digits}_attr () (/_attr () (/
-			s/_${d_digits} () \\
-			{/ () \\{/
+			s/_${d_digits} () \
+			{/ () \
+			{/
 		}
 		:_meta_annotation_loop
 			s/${d_prefix}\([${d_alnum}_]*\):/${d_prefix}\1_/
@@ -223,7 +224,6 @@ doc_parser_build () {
 		s/^${d_prefix}\([${d_alnum}_]*\)_attr/${d_prefix}list="\${${d_prefix}list:-} \1"\\
 		\\
 		${d_prefix}\1_attr/
-		/^$/ { s/^.*$/default/ }
 		p
 		$ { b endmeta }
 		b _annotated_block
@@ -303,7 +303,8 @@ doc_parser_build () {
 		p
 		x
 		/^${d_line}${d_tab}${d_prompt_spec}/! {
-			i ${d_block_output}
+			i \\
+			${d_block_output}
 			b _code_indented
 		}
 		i \\
@@ -355,7 +356,9 @@ doc_parser_build () {
 		s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//
 		/^$/! p
 		$ { b endoutput }
+
 		N
+
 		/\\
 		/ {
 			s/^\\
