@@ -302,11 +302,9 @@ n
         G
 # Closes fences
 
-        /^[0-9][0-9]*	~~~\
-[0-9][0-9]*	~~~/ { b _code_fenced_close }
+        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ { b _code_fenced_close }
 
-        /^[0-9][0-9]*	```\
-[0-9][0-9]*	```/  { b _code_fenced_close }
+        /^[0-9][0-9]*	```[0-9][0-9]*	```/  { b _code_fenced_close }
 
         s/^\([0-9][0-9]*	\)\(~~~\|```\).*/\1\2/
 b _code_fenced_in
@@ -317,11 +315,9 @@ b _code_fenced_in
         G
 # Closes fences
 
-        /^[0-9][0-9]*	~~~\
-[0-9][0-9]*	~~~/ { b _code_fenced_close }
+        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ { b _code_fenced_close }
 
-        /^[0-9][0-9]*	```\
-[0-9][0-9]*	```/  { b _code_fenced_close }
+        /^[0-9][0-9]*	```[0-9][0-9]*	```/  { b _code_fenced_close }
 
         s/^\([0-9][0-9]*	\)\(~~~\|```\).*/\1\2/
 b _code_fenced_in
@@ -371,5 +367,6 @@ a \
 a \
 doc_list () ( echo "$doc_list" )
 # Dispatch parameters
-a [ -z \"${1:-}\" ] && ${2:-:} \"$doc_list\" 1>&2 || doc_${@:-}
+a \
+[ -z \"${1:-}\" ] && ${2:-:} \"$doc_list\" 1>&2 || doc_${@:-}
 :endparsing

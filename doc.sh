@@ -119,7 +119,8 @@ doc_parser_build () {
 	# Sed expression to add shell code that expands parameters
 	d_param_dispatch="$(cat <<-SED
 		# Dispatch parameters
-		a [ -z \"\${1:-}\" ] && \${2:-:} \"\$${d_prefix}list\" 1>&2 || ${d_prefix}\${@:-}
+		a \\
+		[ -z \"\${1:-}\" ] && \${2:-:} \"\$${d_prefix}list\" 1>&2 || ${d_prefix}\${@:-}
 		SED
 	)"
 	# Shell expression to start an output block
@@ -132,10 +133,10 @@ doc_parser_build () {
 	        G
 		# Closes fences
 
-	        /^${d_line}${d_fence_tilde}\\
+	        /^${d_line}${d_fence_tilde}\
 			${d_line}${d_fence_tilde}/ { b _code_fenced_close }
 
-	        /^${d_line}${d_fence_tick}\\
+	        /^${d_line}${d_fence_tick}\
 			${d_line}${d_fence_tick}/  { b _code_fenced_close }
 
 	        ${d_close_fence}
@@ -484,6 +485,7 @@ doc_parser_build () {
 		${d_prefix}list () ( echo "\$${d_prefix}list" )
 		${d_param_dispatch}
 	:endparsing
+
 	SED
     )
 }
