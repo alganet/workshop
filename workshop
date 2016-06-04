@@ -1,0 +1,131 @@
+#!/usr/bin/env sh
+
+workshop ()
+{
+	_executable="${1}"
+	_executable_dir="$(dirname "${_executable}")"
+	_input="${2##*-}"
+	_main="$(basename "${_input}")"
+	_from='https://raw.githubusercontent.com/Mosai/workshop/develop/lib/workshop/'
+	shift 2
+
+	set -euf
+	unsetopt NO_MATCH  >/dev/null 2>&1 || :
+	setopt SHWORDSPLIT >/dev/null 2>&1 || :
+
+	_modules=' : workshop '
+	_dependencies="${_main}"
+
+	test ! -z "${_dependencies}" || return 0
+
+	while true 'Dependency Loop'
+	do
+		for _dependency in ${_dependencies}
+		do
+			_dependency_status='ok'
+
+			for _dependency_check in ${_dependencies}
+			do
+				case " ${_modules} " in
+					*" ${_dependency_check} "* )
+						if test "${_dependency_status}" = 'ok'
+						then
+							continue
+						fi
+						;;
+					* )
+						_dependency_status="${_dependency_check} missed"
+						;;
+				esac
+			done
+
+			if test "${_dependency_status}" = 'ok'
+			then
+				break 2 # Back to 'Dependency Loop'
+			fi
+
+			case ${_modules} in
+				*" ${_dependency} "* )
+					continue
+					;;
+			esac
+
+			_found_module=''
+			_ifs="${IFS}"
+			IFS="${workshop_path_separator:-:}"
+			for _part in ${workshop_path:-${PWD}:${_executable_dir}}
+			do
+				_file="$(echo "${_part}/${_dependency}")"
+
+				if test -f "${_file}"
+				then
+					_found_module="${_file}"
+					break # Back to for _part
+				fi
+			done
+			IFS="${_ifs}"
+			unset _ifs
+
+			if test -z "${_found_module:-}" && test ! -z "${_from:-}"
+			then
+				_remote_url="${_from}${_dependency}"
+				_found_module="${PWD}/${_dependency}"
+				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
+				if command -v workshop >/dev/null 2>&1
+				then
+					if command -v curl
+					then
+						curl -L "${_remote_url}" \
+							2>/dev/null > "${_found_module}"
+					elif command -v wget
+					then
+						wget -qO- "${_remote_url}" \
+							2>/dev/null  > "${_found_module}"
+					else
+						return 127
+					fi
+					if sh -n "${_found_module}" >/dev/null 2>&1
+					then
+						:
+					else
+						rm "${_found_module}"
+						return 1
+					fi
+				else
+					return 127
+				fi
+			fi
+
+			_required=''
+			_from=''
+
+			from ()
+			{
+				_from="${1:-}"
+			}
+
+			require ()
+			{
+				_required="${_required:-} ${*:-} "
+			}
+
+			sh -n "${_found_module}" >/dev/null 2>&1 || return 1
+
+			. "${_found_module}"
+
+			_dependencies="${_required:-} ${_dependencies:-}"
+			_modules="${_modules} ${_dependency} "
+		done
+	done
+
+	set -- "${_main%%.*}" "${@:-}"
+
+	if test -z "${2:-}"
+	then
+		"${1:-}"
+	else
+		"${@:-}"
+	fi
+}
+
+workshop "${0}" "${@:-}"
