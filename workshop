@@ -6,7 +6,7 @@ workshop ()
 	_executable_dir="$(dirname "${_executable}")"
 	_input="${2##*-}"
 	_main="$(basename "${_input}")"
-	_from='https://raw.githubusercontent.com/Mosai/workshop/develop/lib/workshop/'
+	_from='https://raw.githubusercontent.com/alganet/workshop/master/'
 	shift 2
 
 	set -euf
