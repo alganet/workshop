@@ -1,6 +1,9 @@
 :_stream
 $ { b endparsing }
-/^$/ { n; b _stream }
+/^$/ {
+n
+ 	b _stream
+ 	}
 /^0	\(.*\)$/ { b _document }
 b endstream
 
@@ -10,7 +13,10 @@ s/^\([a-f0-9]*\)	\(.*\)/doc_path () ( echo \'\2\' | "${1:-cat}" )/p
 $ { b endoutput }
 n
 /^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _code_indented_open }
-/^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    { h ; b _code_fenced }
+/^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    {
+h
+b _code_fenced
+}
 /^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     { b _meta_annotation_in }
 # Standard line based output
 h
@@ -31,7 +37,10 @@ s/^.*//
 
 :_identify_line
 /^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _code_indented_open }
-/^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    { h ; b _code_fenced }
+/^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    {
+h
+b _code_fenced
+}
 /^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     { b _meta_annotation }
 /^[0-9][0-9]*	\(.*\)/     { b _print_text_line }
 b endstream

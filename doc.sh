@@ -161,7 +161,10 @@ doc_parser_build () {
     cat <<-SED
 	:_stream
 		$ { b endparsing }
-		/^$/ { n; b _stream }
+		/^$/ {
+			n
+		 	b _stream
+	 	}
 		${d_stream_doc} { b _document }
 		b endstream
 
@@ -172,7 +175,10 @@ doc_parser_build () {
 		$ { b endoutput }
 		n
 		${doc_indent}   { b _code_indented_open }
-		${doc_fence}    { h ; b _code_fenced }
+		${doc_fence}    {
+			h
+			b _code_fenced
+		}
 		${doc_meta}     { b _meta_annotation_in }
 		${d_text_mark}
 		$ { b endoutput }
@@ -189,7 +195,10 @@ doc_parser_build () {
 
 	:_identify_line
 		${doc_indent}   { b _code_indented_open }
-		${doc_fence}    { h ; b _code_fenced }
+		${doc_fence}    {
+			h
+			b _code_fenced
+		}
 		${doc_meta}     { b _meta_annotation }
 		${doc_line}     { b _print_text_line }
 		b endstream
