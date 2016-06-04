@@ -87,7 +87,7 @@ doc_load () {
 doc_parser_build () {
 (
 	d_prefix="${1:-${doc_prefix}}"
-	d_hash="$(echo ${d_prefix} | md5sum | sed  's/[^a-f0-9]//g;' | tr 'a-z' 'A-Z' | cut -b1-8)"
+	d_hash="$(echo ${d_prefix})"
 	# A literal tab
     d_tab=$(printf '\t')
     d_digits="[0-9][0-9]*"
@@ -150,7 +150,8 @@ doc_parser_build () {
 		${d_prefix}text_\1 ()\\
 		{\\
 		/p
-		i ${d_block_output}
+		i \
+		${d_block_output}
 		x
 		SED
 	)"
@@ -192,9 +193,12 @@ doc_parser_build () {
 		b endstream
 
 	:_meta_annotation
-		i O_${d_hash}
-		i }
-		i
+		i \
+		O_${d_hash}
+		i \
+		}
+		i \
+
 	:_meta_annotation_in
 		h
 		x
@@ -233,7 +237,8 @@ doc_parser_build () {
 		${d_empty_line}   { b _annotated_block }
 		${doc_indent}   { b _annotated_code_open }
 		${doc_meta}     {
-			i ${d_block_output}
+			i \
+			${d_block_output}
 			b _meta_annotation
 		}
 		${doc_fence}    {
@@ -243,8 +248,10 @@ doc_parser_build () {
 		h
 		s/^\(${d_digits}\)${d_tab}${d_anything}$/	echo text_\1 | "\${1:-cat}" 1>\&2/p
 		g
-		i }
-		i
+		i \
+		}
+		i \
+
 		${d_text_mark}
 		b _print_text_line
 
@@ -262,16 +269,21 @@ doc_parser_build () {
 		$ { b endoutput }
 		n
 		${doc_fence} {
-			i ${d_block_output}
+			i \
+			${d_block_output}
 			b _code_fenced_close
 		}
 		/^${d_line}${d_prompt_spec}/! {
-			i ${d_block_output}
+			i \
+			${d_block_output}
 			b _code_fenced_in
 		}
-		i ${d_block_input}
-		a I_${d_hash}
-		a ${d_block_output}
+		i \
+		${d_block_input}
+		a \
+		I_${d_hash}
+		a \
+		${d_block_output}
 		${d_remove_number}
 
 		p
@@ -294,18 +306,24 @@ doc_parser_build () {
 			i ${d_block_output}
 			b _code_indented
 		}
-		i ${d_block_input}
-		a I_${d_hash}
-		a ${d_block_output}
+		i \
+		${d_block_input}
+		a \
+		I_${d_hash}
+		a \
+		${d_block_output}
 		s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//p
 		$ { b endoutput }
 		n
 		b _code_indented
 
 	:_code_indented_open
-		i O_${d_hash}
-		i }
-		i
+		i \
+		O_${d_hash}
+		i \
+		}
+		i \
+
 		h
 		${doc_list}"\${${d_prefix}list:-} indent_\1"\\
 		\\
@@ -313,15 +331,20 @@ doc_parser_build () {
 		{/
 		p
 		x
-		i ${d_block_output}
+		i \
+		${d_block_output}
 		b _code_indented
 
 	:_code_indented
 		/^${d_line}${d_tab}${d_prompt_spec}/ {
-			i O_${d_hash}
-			i ${d_block_input}
-			a I_${d_hash}
-			a ${d_block_output}
+			i \
+			O_${d_hash}
+			i \
+			${d_block_input}
+			a \
+			I_${d_hash}
+			a \
+			${d_block_output}
 			s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//
 
 			p
@@ -338,11 +361,13 @@ doc_parser_build () {
 			s/^\\
 			//
 			${doc_indent} {
-				i
+				i \
+
 				b _code_indented
 			}
 			${d_empty_line} {
-				i
+				i \
+
 				b _code_indented
 			}
 		}
@@ -352,7 +377,8 @@ doc_parser_build () {
 		${d_empty_line} { b _code_indented }
 		${doc_meta}   { b _meta_annotation }
 		${doc_line}   {
-			i O_${d_hash}
+			i \
+			O_${d_hash}
 			b _code_indented_close
 		}
 		b endstream
@@ -360,15 +386,20 @@ doc_parser_build () {
 
 	:_code_indented_close
 		${doc_meta}    { b _meta_annotation }
-		i }
-		i
+		i \
+		}
+		i \
+
 		${d_text_mark}
 		b _identify_line
 
 	:_code_fenced
-		i O_${d_hash}
-		i }
-		i
+		i \
+		O_${d_hash}
+		i \
+		}
+		i \
+
 		${doc_list}"\${${d_prefix}list:-} fence_\1"\\
 		\\
 		${d_prefix}fence_\1_attr () ( echo '\2' | "\${1:-cat}" )\\
@@ -378,18 +409,24 @@ doc_parser_build () {
 		$ { b endoutput }
 		n
 		${doc_fence} {
-			i ${d_block_output}
+			i \
+			${d_block_output}
 			b _code_fenced_close
 		}
-		i ${d_block_output}
+		i \
+		${d_block_output}
 		b _code_fenced_in
 
 	:_code_fenced_in
 		/^${d_line}${d_prompt_spec}/ {
-			i O_${d_hash}
-			i ${d_block_input}
-			a I_${d_hash}
-			a ${d_block_output}
+			i \
+			O_${d_hash}
+			i \
+			${d_block_input}
+			a \
+			I_${d_hash}
+			a \
+			${d_block_output}
 			${d_remove_number}
 
 			p
@@ -416,9 +453,12 @@ doc_parser_build () {
         	${d_close_fence}
         	${d_remove_number}
         	s/^${d_anything}$//
-		i O_${d_hash}
-		i }
-		i
+		i \
+		O_${d_hash}
+		i \
+		}
+		i \
+
 		p
 		$ { b endstream }
 		n
@@ -426,18 +466,20 @@ doc_parser_build () {
 		b _identify_line
 
 	:endoutput
-		a O_${d_hash}
+		a \
+		O_${d_hash}
 		b endnormal
 	:endmeta
-		a :
+		a \
+		:
 	:endnormal
-		a }
+		a \
+		}
 	:endstream
-		a ${d_prefix}list () ( echo "\$${d_prefix}list" )
+		a \
+		${d_prefix}list () ( echo "\$${d_prefix}list" )
 		${d_param_dispatch}
 	:endparsing
-		q
-
 	SED
     )
 }
