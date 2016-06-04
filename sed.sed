@@ -1,48 +1,68 @@
 :_stream
-$ { b endparsing }
+$ {
+b endparsing
+}
 /^$/ {
 n
  	b _stream
  	}
-/^0	\(.*\)$/ { b _document }
+/^0	\(.*\)$/ {
+b _document
+}
 b endstream
 
 :_document
 s/^[0-9][0-9]*	//
 s/^\([a-f0-9]*\)	\(.*\)/doc_path () ( echo \'\2\' | "${1:-cat}" )/p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
-/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _code_indented_open }
+/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   {
+b _code_indented_open
+}
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    {
 h
 b _code_fenced
 }
-/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     { b _meta_annotation_in }
+/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     {
+b _meta_annotation_in
+}
 # Standard line based output
 h
 s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"doc_text_\1 (){/p
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
 x
-$ { b endoutput }
+$ {
+b endoutput
+}
 b _identify_line
 
 :_print_text_line
 s/^[0-9][0-9]*	//
 
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 N
 s/^.*//
 
 :_identify_line
-/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _code_indented_open }
+/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   {
+b _code_indented_open
+}
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/    {
 h
 b _code_fenced
 }
-/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     { b _meta_annotation }
-/^[0-9][0-9]*	\(.*\)/     { b _print_text_line }
+/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     {
+b _meta_annotation
+}
+/^[0-9][0-9]*	\(.*\)/     {
+b _print_text_line
+}
 b endstream
 
 :_meta_annotation
@@ -71,17 +91,27 @@ t _meta_annotation_loop
 
 s/^doc_\([a-zA-Z0-9_]*\)_attr/doc_list="${doc_list:-} \1"doc_\1_attr/
 p
-$ { b endmeta }
+$ {
+b endmeta
+}
 b _annotated_block
 
 :_annotated_block
-$ { b endmeta }
+$ {
+b endmeta
+}
 s/^[0-9][0-9]*	//
 
-$ { b endmeta }
+$ {
+b endmeta
+}
 n
-/^[0-9][0-9]*	$/   { b _annotated_block }
-/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _annotated_code_open }
+/^[0-9][0-9]*	$/   {
+b _annotated_block
+}
+/^[0-9][0-9]*	\(	\|    \)\(.*\)$/   {
+b _annotated_code_open
+}
 /^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     {
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
@@ -109,7 +139,9 @@ b _print_text_line
 :_annotated_fence_open
 s/^\([0-9][0-9]*\)	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/	echo fence_\1 | "${1:-cat}"  1>\&2}doc_list="${doc_list:-} fence_\1"doc_fence_\1_attr () ( echo '\2\3' | "${1:-cat}" )doc_fence_\1 () {/
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/ {
 i \
@@ -130,7 +162,9 @@ a \
 s/^[0-9][0-9]*	//
 
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 b _code_fenced_in
 
@@ -151,7 +185,9 @@ I_doc_
 a \
 \	cat <<'O_doc_' | "${1:-cat}"
 s/^[0-9][0-9]*		*\(	\|\s\)*//p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 b _code_indented
 
@@ -183,13 +219,17 @@ a \
 s/^[0-9][0-9]*		*\(	\|\s\)*//
 
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 b _code_indented
 }
 s/^[0-9][0-9]*		*\(	\|\s\)*//
 /^$/! p
-$ { b endoutput }
+$ {
+b endoutput
+}
 
 N
 
@@ -207,9 +247,15 @@ b _code_indented
 }
 }
 s/^\(.*\)\(.*\)$/\2/
-/^[0-9][0-9]*	\(	\|    \)\(.*\)$/ { b _code_indented }
-/^[0-9][0-9]*	$/ { b _code_indented }
-/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/   { b _meta_annotation }
+/^[0-9][0-9]*	\(	\|    \)\(.*\)$/ {
+b _code_indented
+}
+/^[0-9][0-9]*	$/ {
+b _code_indented
+}
+/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/   {
+b _meta_annotation
+}
 /^[0-9][0-9]*	\(.*\)/   {
 i \
 O_doc_
@@ -219,7 +265,9 @@ b endstream
 
 
 :_code_indented_close
-/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/    { b _meta_annotation }
+/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/    {
+b _meta_annotation
+}
 i \
 }
 i \
@@ -240,7 +288,9 @@ i \
 i \
 
 s/^\([0-9][0-9]*\)	\(.*\)/doc_list="${doc_list:-} fence_\1"doc_fence_\1_attr () ( echo '\2' | "${1:-cat}" )doc_fence_\1 () {/p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/ {
 i \
@@ -264,16 +314,22 @@ a \
 s/^[0-9][0-9]*	//
 
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
 
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/ {
         G
 # Closes fences
 
-        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ { b _code_fenced_close }
+        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ {
+b _code_fenced_close
+}
 
-        /^[0-9][0-9]*	```[0-9][0-9]*	```/  { b _code_fenced_close }
+        /^[0-9][0-9]*	```[0-9][0-9]*	```/  {
+b _code_fenced_close
+}
 
         s/^\([0-9][0-9]*	\)\(~~~\|```\).*/\1\2/
 b _code_fenced_in
@@ -284,16 +340,22 @@ b _code_fenced_in
         G
 # Closes fences
 
-        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ { b _code_fenced_close }
+        /^[0-9][0-9]*	~~~[0-9][0-9]*	~~~/ {
+b _code_fenced_close
+}
 
-        /^[0-9][0-9]*	```[0-9][0-9]*	```/  { b _code_fenced_close }
+        /^[0-9][0-9]*	```[0-9][0-9]*	```/  {
+b _code_fenced_close
+}
 
         s/^\([0-9][0-9]*	\)\(~~~\|```\).*/\1\2/
 b _code_fenced_in
 }
 s/^[0-9][0-9]*	//
 p
-$ { b endoutput }
+$ {
+b endoutput
+}
 n
     b _code_fenced_in
 
@@ -308,7 +370,9 @@ i \
 i \
 
 p
-$ { b endstream }
+$ {
+b endstream
+}
 n
 # Standard line based output
 h

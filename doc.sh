@@ -134,10 +134,14 @@ doc_parser_build () {
 		# Closes fences
 
 	        /^${d_line}${d_fence_tilde}\
-			${d_line}${d_fence_tilde}/ { b _code_fenced_close }
+			${d_line}${d_fence_tilde}/ {
+				b _code_fenced_close
+			}
 
 	        /^${d_line}${d_fence_tick}\
-			${d_line}${d_fence_tick}/  { b _code_fenced_close }
+			${d_line}${d_fence_tick}/  {
+				b _code_fenced_close
+			}
 
 	        ${d_close_fence}
 		SED
@@ -160,47 +164,67 @@ doc_parser_build () {
 	# Main sed script built with templates above
     cat <<-SED
 	:_stream
-		$ { b endparsing }
+		$ {
+			b endparsing
+		}
 		/^$/ {
 			n
 		 	b _stream
 	 	}
-		${d_stream_doc} { b _document }
+		${d_stream_doc} {
+			b _document
+		}
 		b endstream
 
 	:_document
 		${d_remove_number}
 		s/^\([a-f0-9]*\)${d_tab}${d_anything}/${d_prefix}path () ( echo \'\2\' | "\${1:-cat}" )\
 		/p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
-		${doc_indent}   { b _code_indented_open }
+		${doc_indent}   {
+			b _code_indented_open
+		}
 		${doc_fence}    {
 			h
 			b _code_fenced
 		}
-		${doc_meta}     { b _meta_annotation_in }
+		${doc_meta}     {
+			b _meta_annotation_in
+		}
 		${d_text_mark}
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		b _identify_line
 
 	:_print_text_line
 		${d_remove_number}
 
 		p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		N
 		s/^.*\
 		//
 
 	:_identify_line
-		${doc_indent}   { b _code_indented_open }
+		${doc_indent}   {
+			b _code_indented_open
+		}
 		${doc_fence}    {
 			h
 			b _code_fenced
 		}
-		${doc_meta}     { b _meta_annotation }
-		${doc_line}     { b _print_text_line }
+		${doc_meta}     {
+			b _meta_annotation
+		}
+		${doc_line}     {
+			b _print_text_line
+		}
 		b endstream
 
 	:_meta_annotation
@@ -236,17 +260,27 @@ doc_parser_build () {
 		\
 		${d_prefix}\1_attr/
 		p
-		$ { b endmeta }
+		$ {
+			b endmeta
+		}
 		b _annotated_block
 
 	:_annotated_block
-		$ { b endmeta }
+		$ {
+			b endmeta
+		}
 		${d_remove_number}
 
-		$ { b endmeta }
+		$ {
+			b endmeta
+		}
 		n
-		${d_empty_line}   { b _annotated_block }
-		${doc_indent}   { b _annotated_code_open }
+		${d_empty_line}   {
+			b _annotated_block
+		}
+		${doc_indent}   {
+			b _annotated_code_open
+		}
 		${doc_meta}     {
 			i \\
 			${d_block_output}
@@ -277,7 +311,9 @@ doc_parser_build () {
 		${d_prefix}fence_\1 () \
 		{/
 		p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
 		${doc_fence} {
 			i \\
@@ -298,7 +334,9 @@ doc_parser_build () {
 		${d_remove_number}
 
 		p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
 		b _code_fenced_in
 
@@ -325,7 +363,9 @@ doc_parser_build () {
 		a \\
 		${d_block_output}
 		s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
 		b _code_indented
 
@@ -360,13 +400,17 @@ doc_parser_build () {
 			s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//
 
 			p
-			$ { b endoutput }
+			$ {
+				b endoutput
+			}
 			n
 			b _code_indented
 		}
 		s/^${d_line}${d_tab}*\(${d_tab}\|\s\)*//
 		/^$/! p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 
 		N
 
@@ -387,9 +431,15 @@ doc_parser_build () {
 		}
 		s/^${d_anything}\
 		${d_anything}$/\2/
-		${doc_indent} { b _code_indented }
-		${d_empty_line} { b _code_indented }
-		${doc_meta}   { b _meta_annotation }
+		${doc_indent} {
+			b _code_indented
+		}
+		${d_empty_line} {
+			b _code_indented
+		}
+		${doc_meta}   {
+			b _meta_annotation
+		}
 		${doc_line}   {
 			i \\
 			O_${d_hash}
@@ -399,7 +449,9 @@ doc_parser_build () {
 
 
 	:_code_indented_close
-		${doc_meta}    { b _meta_annotation }
+		${doc_meta}    {
+			b _meta_annotation
+		}
 		i \\
 		}
 		i \\
@@ -420,7 +472,9 @@ doc_parser_build () {
 		\
 		${d_prefix}fence_\1 () \
 		{/p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
 		${doc_fence} {
 			i \\
@@ -444,7 +498,9 @@ doc_parser_build () {
 			${d_remove_number}
 
 			p
-			$ { b endoutput }
+			$ {
+				b endoutput
+			}
 			n
 
 			${doc_fence} {
@@ -459,7 +515,9 @@ doc_parser_build () {
 		}
 		${d_remove_number}
 		p
-		$ { b endoutput }
+		$ {
+			b endoutput
+		}
 		n
 	    b _code_fenced_in
 
@@ -474,7 +532,9 @@ doc_parser_build () {
 		i \\
 
 		p
-		$ { b endstream }
+		$ {
+			b endstream
+		}
 		n
 		${d_text_mark}
 		b _identify_line
