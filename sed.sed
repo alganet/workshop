@@ -6,8 +6,7 @@ b endstream
 
 :_document
 s/^[0-9][0-9]*	//
-s/^\([a-f0-9]*\)	\(.*\)/doc_path () ( echo \'\2\' | "${1:-cat}" )\
-/p
+s/^\([a-f0-9]*\)	\(.*\)/doc_path () ( echo \'\2\' | "${1:-cat}" )/p
 $ { b endoutput }
 n
 /^[0-9][0-9]*	\(	\|    \)\(.*\)$/   { b _code_indented_open }
@@ -15,11 +14,7 @@ n
 /^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/     { b _meta_annotation_in }
 # Standard line based output
 h
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"\
-\
-doc_text_\1 ()\
-{\
-/p
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"doc_text_\1 (){/p
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
 x
@@ -55,10 +50,7 @@ h
 s/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/\3/
 s/[^a-zA-Z0-9]/_/g
 x
-s/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/doc_\3_\1_attr () ( echo '\4' | "${1:-cat}"  )\
-\
-doc_\3_\1 () \
-{/
+s/^\([0-9][0-9]*\)	\(\[~\]\:\)\([a-zA-Z0-9:]*\)\s*(*\([^)]*\)\s*)*\s*$/doc_\3_\1_attr () ( echo '\4' | "${1:-cat}"  )doc_\3_\1 () {/
 
 /doc_\([a-zA-Z0-9_]*\):/ {
 s/_[0-9][0-9]*_attr () (/_attr () (/
@@ -68,9 +60,7 @@ s/_[0-9][0-9]* () {/ () {/
 s/doc_\([a-zA-Z0-9_]*\):/doc_\1_/
 t _meta_annotation_loop
 
-s/^doc_\([a-zA-Z0-9_]*\)_attr/doc_list="${doc_list:-} \1"\
-\
-doc_\1_attr/
+s/^doc_\([a-zA-Z0-9_]*\)_attr/doc_list="${doc_list:-} \1"doc_\1_attr/
 p
 $ { b endmeta }
 b _annotated_block
@@ -101,26 +91,14 @@ i \
 
 # Standard line based output
 h
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"\
-\
-doc_text_\1 ()\
-{\
-/p
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"doc_text_\1 (){/p
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
 x
 b _print_text_line
 
 :_annotated_fence_open
-s/^\([0-9][0-9]*\)	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/	echo fence_\1 | "${1:-cat}"  1>\&2\
-}\
-\
-doc_list="${doc_list:-} fence_\1"\
-\
-doc_fence_\1_attr () ( echo '\2\3' | "${1:-cat}" )\
-\
-doc_fence_\1 () \
-{/
+s/^\([0-9][0-9]*\)	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/	echo fence_\1 | "${1:-cat}"  1>\&2}doc_list="${doc_list:-} fence_\1"doc_fence_\1_attr () ( echo '\2\3' | "${1:-cat}" )doc_fence_\1 () {/
 p
 $ { b endoutput }
 n
@@ -149,13 +127,7 @@ b _code_fenced_in
 
 :_annotated_code_open
 h
-s/^\([0-9][0-9]*\)	\(.*\)/	echo indent_\1 | "${1:-cat}" 1>\&2\
-}\
-\
-doc_list="${doc_list:-} indent_\1"\
-\
-doc_indent_\1 ()\
-{/
+s/^\([0-9][0-9]*\)	\(.*\)/	echo indent_\1 | "${1:-cat}" 1>\&2}doc_list="${doc_list:-} indent_\1"doc_indent_\1 (){/
 p
 x
 /^[0-9][0-9]*		[a-zA-Z0-9@]*\(\$\|>\|%\) */! {
@@ -182,10 +154,7 @@ i \
 i \
 
 h
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list="${doc_list:-} indent_\1"\
-\
-doc_indent_\1 () \
-{/
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list="${doc_list:-} indent_\1"doc_indent_\1 () {/
 p
 x
 i \
@@ -248,11 +217,7 @@ i \
 
 # Standard line based output
 h
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"\
-\
-doc_text_\1 ()\
-{\
-/p
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"doc_text_\1 (){/p
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
 x
@@ -265,12 +230,7 @@ i \
 }
 i \
 
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list="${doc_list:-} fence_\1"\
-\
-doc_fence_\1_attr () ( echo '\2' | "${1:-cat}" )\
-\
-doc_fence_\1 () \
-{/p
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list="${doc_list:-} fence_\1"doc_fence_\1_attr () ( echo '\2' | "${1:-cat}" )doc_fence_\1 () {/p
 $ { b endoutput }
 n
 /^[0-9][0-9]*	\(~~~\|```\)\([a-zA-Z0-9]*\)\(.*\)$/ {
@@ -343,11 +303,7 @@ $ { b endstream }
 n
 # Standard line based output
 h
-s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"\
-\
-doc_text_\1 ()\
-{\
-/p
+s/^\([0-9][0-9]*\)	\(.*\)/doc_list=\"${doc_list:-} text_\1\"doc_text_\1 (){/p
 i \
 \	cat <<'O_doc_' | "${1:-cat}"
 x

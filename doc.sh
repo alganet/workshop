@@ -147,10 +147,10 @@ doc_parser_build () {
 	d_text_mark="$(cat <<-SED
 		# Standard line based output
 		h
-		${doc_list}\"\${${d_prefix}list:-} text_\1\"\\
-		\\
-		${d_prefix}text_\1 ()\\
-		{\\
+		${doc_list}\"\${${d_prefix}list:-} text_\1\"\
+		\
+		${d_prefix}text_\1 ()\
+		{\
 		/p
 		i \\
 		${d_block_output}
@@ -167,7 +167,7 @@ doc_parser_build () {
 
 	:_document
 		${d_remove_number}
-		s/^\([a-f0-9]*\)${d_tab}${d_anything}/${d_prefix}path () ( echo \'\2\' | "\${1:-cat}" )\\
+		s/^\([a-f0-9]*\)${d_tab}${d_anything}/${d_prefix}path () ( echo \'\2\' | "\${1:-cat}" )\
 		/p
 		$ { b endoutput }
 		n
@@ -208,9 +208,9 @@ doc_parser_build () {
 		s${doc_meta}\3/
 		s/[^${d_alnum}]/_/g
 		x
-		s${doc_meta}${d_prefix}\3_\1_attr () ( echo '\4' | "\${1:-cat}"  )\\
-		\\
-		${d_prefix}\3_\1 () \\
+		s${doc_meta}${d_prefix}\3_\1_attr () ( echo '\4' | "\${1:-cat}"  )\
+		\
+		${d_prefix}\3_\1 () \
 		{/
 
 		/${d_prefix}\([${d_alnum}_]*\):/ {
@@ -223,8 +223,8 @@ doc_parser_build () {
 			s/${d_prefix}\([${d_alnum}_]*\):/${d_prefix}\1_/
 			t _meta_annotation_loop
 
-		s/^${d_prefix}\([${d_alnum}_]*\)_attr/${d_prefix}list="\${${d_prefix}list:-} \1"\\
-		\\
+		s/^${d_prefix}\([${d_alnum}_]*\)_attr/${d_prefix}list="\${${d_prefix}list:-} \1"\
+		\
 		${d_prefix}\1_attr/
 		p
 		$ { b endmeta }
@@ -258,14 +258,14 @@ doc_parser_build () {
 		b _print_text_line
 
 	:_annotated_fence_open
-		s/^\(${d_digits}\)${d_tab}\(${d_both_fences}\)\([${d_alnum}]*\)${d_anything}$/	echo fence_\1 | "\${1:-cat}"  1>\&2\\
-		}\\
-		\\
-		${d_prefix}list="\${${d_prefix}list:-} fence_\1"\\
-		\\
-		${d_prefix}fence_\1_attr () ( echo '\2\3' | "\${1:-cat}" )\\
-		\\
-		${d_prefix}fence_\1 () \\
+		s/^\(${d_digits}\)${d_tab}\(${d_both_fences}\)\([${d_alnum}]*\)${d_anything}$/	echo fence_\1 | "\${1:-cat}"  1>\&2\
+		}\
+		\
+		${d_prefix}list="\${${d_prefix}list:-} fence_\1"\
+		\
+		${d_prefix}fence_\1_attr () ( echo '\2\3' | "\${1:-cat}" )\
+		\
+		${d_prefix}fence_\1 () \
 		{/
 		p
 		$ { b endoutput }
@@ -295,12 +295,12 @@ doc_parser_build () {
 
 	:_annotated_code_open
 		h
-		s/^\(${d_digits}\)${d_tab}${d_anything}/	echo indent_\1 | "\${1:-cat}" 1>\&2\\
-		}\\
-		\\
-		${d_prefix}list="\${${d_prefix}list:-} indent_\1"\\
-		\\
-		${d_prefix}indent_\1 ()\\
+		s/^\(${d_digits}\)${d_tab}${d_anything}/	echo indent_\1 | "\${1:-cat}" 1>\&2\
+		}\
+		\
+		${d_prefix}list="\${${d_prefix}list:-} indent_\1"\
+		\
+		${d_prefix}indent_\1 ()\
 		{/
 		p
 		x
@@ -328,9 +328,9 @@ doc_parser_build () {
 		i \\
 
 		h
-		${doc_list}"\${${d_prefix}list:-} indent_\1"\\
-		\\
-		${d_prefix}indent_\1 () \\
+		${doc_list}"\${${d_prefix}list:-} indent_\1"\
+		\
+		${d_prefix}indent_\1 () \
 		{/
 		p
 		x
@@ -405,11 +405,11 @@ doc_parser_build () {
 		}
 		i \\
 
-		${doc_list}"\${${d_prefix}list:-} fence_\1"\\
-		\\
-		${d_prefix}fence_\1_attr () ( echo '\2' | "\${1:-cat}" )\\
-		\\
-		${d_prefix}fence_\1 () \\
+		${doc_list}"\${${d_prefix}list:-} fence_\1"\
+		\
+		${d_prefix}fence_\1_attr () ( echo '\2' | "\${1:-cat}" )\
+		\
+		${d_prefix}fence_\1 () \
 		{/p
 		$ { b endoutput }
 		n
