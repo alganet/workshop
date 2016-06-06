@@ -1,0 +1,6 @@
+script:
+  - workshop posit.sh run .
+matrix:
+  include:
+      os:  linux
+      os:  osx
