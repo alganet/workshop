@@ -63,7 +63,7 @@ parsed ()
 	prepend ()
 	{
 		cat <<-SEDN
-		i \\
+		i \
 		${*:-}
 		SEDN
 	}
@@ -71,7 +71,7 @@ parsed ()
 	append ()
 	{
 		cat <<-SEDN
-		a \\
+		a \
 		${*:-}
 		SEDN
 	}
