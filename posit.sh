@@ -73,7 +73,7 @@ posit_parse ()
 					case "${_element_href:-}" in
 						'test:module' )
 							_no=$(($_no + 1))
-							${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
+							workshop_executable="${workshop_executable}" ${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
 								set -euf
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -88,7 +88,7 @@ posit_parse ()
 							;;
 						'test' )
 							_no=$(($_no + 1))
-							${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
+							workshop_executable="${workshop_executable}" ${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
 								set -euf
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :

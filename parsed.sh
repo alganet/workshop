@@ -4,37 +4,37 @@ parsed ()
 {
 	context ()
 	{
-		echo ":_${1}"
+		printf %s\\n ":_${1}"
 	}
 
 	print ()
 	{
-		echo '	p'
+		printf %s\\n '	p'
 	}
 
 	mark ()
 	{
-		echo "	s/^/${1}	/"
+		printf %s\\n "	s/^/${1}	/"
 	}
 
 	delete ()
 	{
-		echo '	d'
+		printf %s\\n '	d'
 	}
 
 	next ()
 	{
-		echo '	n'
+		printf %s\\n '	n'
 	}
 
 	quit ()
 	{
-		echo '	q'
+		printf %s\\n '	q'
 	}
 
 	debug ()
 	{
-		echo '	l'
+		printf %s\\n '	l'
 	}
 
 	line ()
@@ -50,7 +50,7 @@ parsed ()
 
 	replace ()
 	{
-		echo "	s/${1}/${2:-}/"
+		printf %s\\n "	s/${1}/${2:-}/"
 	}
 
 	grind ()
@@ -80,24 +80,24 @@ parsed ()
 
 	hold ()
 	{
-		echo '	h'
+		printf %s\\n '	h'
 	}
 
 	keep ()
 	{
-		echo '	H'
+		printf %s\\n '	H'
 	}
 
 	get ()
 	{
-		echo '	g'
+		printf %s\\n '	g'
 	}
 
 	detach ()
 	{
 		hold
 		get
-		replace "\(${2}\).*$" "${1}	\\\\1"
+		replace "\(${2}\).*$" "${1}	\\1"
 		print
 		get
 		replace "^${2}" ''
@@ -111,36 +111,36 @@ parsed ()
 
 	ifend ()
 	{
-		echo "$	{"
+		printf %s\\n "$	{"
 		"${1}" "${2:-}"
-		echo "	}"
+		printf %s\\n "	}"
 		echo
 	}
 
 	ifmatch ()
 	{
-		echo "/^${1}/	{"
+		printf %s\\n "/^${1}/	{"
 		"${2}" "${3:-}"
-		echo "	}"
+		printf %s\\n "	}"
 		echo
 	}
 
 	ifnotmatchall ()
 	{
-		echo "/${1}/!	{"
+		printf %s\\n "/${1}/!	{"
 		"${2}" "${3:-}"
-		echo "	}"
-		echo
+		printf %s\\n "	}"
+		printf %s\\n
 	}
 
 	swap ()
 	{
-		echo '	x'
+		printf %s\\n '	x'
 	}
 
 	enter ()
 	{
-		echo "	b _${1}"
+		printf %s\\n "	b _${1}"
 	}
 
 	replaceall ()
