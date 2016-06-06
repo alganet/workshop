@@ -1,6 +1,12 @@
 script:
-  - workshop posit.sh run .
+  - $TARGET_SH workshop posit.sh run .
 matrix:
   include:
+    - env: TARGET_SH="sh"
       os:  linux
+
+    - env: TARGET_SH="bash"
+      os:  linux
+
+    - env: TARGET_SH="bash"
       os:  osx
