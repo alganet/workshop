@@ -31,45 +31,44 @@ doc_filter ()
 {
 	_selector="${1:-*}"
 	_meta=''
+	_n="
+"
 
 	while IFS='' read -r _line
 	do
-		case "${_line}" in
-			'@'* )
-				_meta="${_meta:-}${_meta:+
-}${_line}"
-				;;
-			[a-z]* )
-				if test '*' = "${_selector}"
-				then
-					_element=1
-					test -z "${_meta}" ||
-						echo "${_meta}
+		case "${_line%%	*}" in
+		'@name'|'@href'|'@title'|'@class' )
+			_meta="${_meta:-}${_meta:+${_n}}${_line}"
+			;;
+		[a-z]* )
+			if test '*' = "${_selector}"
+			then
+				_element=1
+				test -z "${_meta}" || echo "${_meta}
 "
-					echo "${_line}"
-				else
-					_ifs="${IFS}"
-					IFS=','
-					for _sel in ${_selector}
-					do
-						case "${_line}" in
-							"${_sel}"* )
-									_element=1
-									test -z "${_meta}" ||
-										echo "${_meta}
-"
-									echo "${_line}"
-								;;
-						esac
-					done
-					IFS="${_ifs}"
-				fi
-				_meta=
-				;;
-			'' )
-				test -z "${_element:-}" || echo "${_line}"
-				_element=
-				;;
+				echo "${_line}"
+			else
+				_ifs="${IFS}"
+				IFS=','
+				_current="${_line%%	*}"
+				for _sel in ${_selector}
+				do
+					if test "${_sel}" = "${_current}"
+					then
+						_element=1
+						test -z "${_meta}" || echo "${_meta}
+	"
+						echo "${_line}"
+					fi
+				done
+				IFS="${_ifs}"
+			fi
+			_meta=
+			;;
+		'' )
+			test -z "${_element:-}" || echo "${_line}"
+			_element=
+			;;
 		esac
 	done
 }
@@ -97,6 +96,10 @@ doc_parse_tokens ()
 	_link_close='\]:'
 	_link_until_open="[^(\"]*"
 	_link="${_link_open}${_link_val}${_link_close}"
+	_bold="$(tput 'bold' || :)"
+	_reset="$(tput 'sgr0' || :)"
+	_rev="$(tput 'rev' || :)"
+	_dim="$(tput 'dim' || :)"
 }
 
 doc_parse_draw ()
@@ -124,12 +127,12 @@ doc_parse_draw ()
 
 	context 'h1'
 		replace "h1	" ''
-		replace "\(.*\)$" '\033[1m\1\033[0m'
+		replace "\(.*\)$" "${_bold}\1${_reset}"
 		hold
 		get
 		replace '........' ''
 		replaceall 'h1char' '='
-		replace "\(.*\)$" '\033[2m\1\033[0m'
+		replace "\(.*\)$" "${_dim}\1${_reset}"
 		keep
 		get
 		print
@@ -138,12 +141,12 @@ doc_parse_draw ()
 
 	context 'h2'
 		replace "h2	" ''
-		replace "\(.*\)$" '\033[1m\1\033[0m'
+		replace "\(.*\)$" "${_bold}\1${_reset}"
 		hold
 		get
 		replace '........' ''
 		replaceall 'h2char' '-'
-		replace "\(.*\)$" '\033[2m\1\033[0m'
+		replace "\(.*\)$" "${_dim}\1${_reset}"
 		keep
 		get
 		print
@@ -164,7 +167,7 @@ doc_parse_draw ()
 		enter 'codepad'
 
 	context 'codepaint'
-		replace "\(.*\)$" '\033[2;7m    \033[0;7m\1\033[0m'
+		replace ".*" "${_dim}${_rev}    ${_reset}${_rev}&${_reset}"
 		print
 		next
 		enter 'list'

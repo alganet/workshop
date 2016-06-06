@@ -28,17 +28,15 @@ workshop ()
 
 			for _dependency_check in ${_dependencies}
 			do
-				case " ${_modules} " in
-					*" ${_dependency_check} "* )
-						if test "${_dependency_status}" = 'ok'
-						then
-							continue
-						fi
-						;;
-					* )
+				if test "${_modules#*$_dependency_check}" != "$_modules"
+				then
+					if test "${_dependency_status}" = 'ok'
+					then
+						continue
+					fi
+				else
 						_dependency_status="${_dependency_check} missed"
-						;;
-				esac
+				fi
 			done
 
 			if test "${_dependency_status}" = 'ok'
@@ -46,11 +44,10 @@ workshop ()
 				break 2 # Back to 'Dependency Loop'
 			fi
 
-			case ${_modules} in
-				*" ${_dependency} "* )
-					continue
-					;;
-			esac
+			if test "${_modules#*$_dependency}" != "$_modules"
+			then
+				continue
+			fi
 
 			_found_module=''
 			_ifs="${IFS}"

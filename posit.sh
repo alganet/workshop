@@ -7,7 +7,7 @@ posit ()
 	dispatch 'posit' "${@:-}"
 }
 
-posit_dispatched ()
+posit_command_run ()
 {
 	find "${1:-${PWD}}" -type f | grep ".md$" | posit_code_elements
 }
@@ -16,7 +16,7 @@ posit_code_elements ()
 {
 	while IFS='' read -r _file_path
 	do
-		doc_command_elements "${_file_path}" "code,h"
+		doc_command_elements "${_file_path}" "code,h1,h6"
 		echo
 	done | posit_parse
 }
@@ -24,52 +24,54 @@ posit_code_elements ()
 posit_parse ()
 {
 	_no=0
+	_n="
+"
+
 	while IFS='' read -r _element_line
 	do
-		case "${_element_line}" in
-			'@name	'* )
+		case "${_element_line%%	*}" in
+			'@name' )
 				_element_name="${_element_line##*	}"
 				;;
-			'@href	'* )
+			'@href' )
 				_element_href="${_element_line##*	}"
 				;;
-			'@title	'* )
+			'@title' )
 				_element_title="${_element_line##*	}"
 				;;
-			'@class	'* )
+			'@class' )
 				_element_class="${_element_line##*	}"
 				;;
-			'h6	'* )
+			'h6' )
 				_element_heading="${_element_line##*	}"
 				;;
-			'h5	'* )
+			'h5' )
 				echo "##### ${_element_line##*	}"
 				;;
-			'h4	'* )
+			'h4' )
 				echo "#### ${_element_line##*	}"
 				;;
-			'h3	'* )
+			'h3' )
 				echo "### ${_element_line##*	}"
 				;;
-			'h2	'* )
+			'h2' )
 				echo ""
 				echo "## ${_element_line##*	}"
 				echo ""
 				;;
-			'h1	'* )
+			'h1' )
 				echo ""
 				echo "# ${_element_line##*	}"
 				echo ""
 				;;
-			'code	'* )
-				_element="${_element:-}${_element:+
-}${_element_line##*	}"
+			'code' )
+				_element="${_element:-}${_element:+${_n}}${_element_line##*	}"
 				;;
 			'' )
 				if test ! -z "${_element:-}"
 				then
 					case "${_element_href:-}" in
-						'test:module'* )
+						'test:module' )
 							_no=$(($_no + 1))
 							${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
 								set -euf
@@ -84,7 +86,7 @@ posit_parse ()
 								. "${workshop_executable}"
 							SHELL
 							;;
-						'test'* )
+						'test' )
 							_no=$(($_no + 1))
 							${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
 								set -euf
