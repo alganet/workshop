@@ -97,7 +97,7 @@ parsed ()
 	{
 		hold
 		get
-		replace "^\(${2}\).*" "${1}	\1"
+		replace "\(${2}\).*$" "${1}	\\\\1"
 		print
 		get
 		replace "^${2}" ''
