@@ -2,7 +2,7 @@
 
 dispatch ()
 {
-	_ns="$1"
+	_ns="${1}"
 	_arg="${2:-}"
 
 	if test '_' = '_'${_arg}
@@ -37,8 +37,6 @@ dispatch ()
 
 	set -- "${_target}" "${@:-}"
 
-	unset _long _long_name _long_value _short  _target _arg
-
 	if command -v 'dispatch' >/dev/null 2>&1
 	then :
 	else
@@ -46,7 +44,7 @@ dispatch ()
 
 		if test "${_code}" = '127'
 		then
-			"${_ns}_dispatched" "${@:-}"
+			"${_ns}_dispatched" "${_arg}"
 			return $?
 		fi
 
@@ -61,7 +59,7 @@ dispatch ()
 
 	if command -v "${_ns}_dispatched" >/dev/null 2>&1
 	then
-		"${_ns}_dispatched" "${@:-}"
+		"${_ns}_dispatched" "${_arg}"
 		return $?
 	fi
 

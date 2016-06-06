@@ -2,19 +2,21 @@
 
 workshop ()
 {
-	_executable="${1}"
+	test "${#}" -gt 1 || return 0
+	_executable="${1:-}"
 	_executable_dir="$(dirname "${_executable}")"
 	_input="${2##*-}"
+	_input="${_input##*-}"
 	_main="$(basename "${_input}")"
-	_server='https://raw.githubusercontent.com/alganet/workshop/master/'
+	_server="${workshop_server:-https://raw.githubusercontent.com/alganet/workshop/master/}"
 	shift 2
 
 	set -euf
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
 	setopt SHWORDSPLIT >/dev/null 2>&1 || :
 
-	_modules=' : workshop '
-	_dependencies="${_main}"
+	_modules="${workshop_modules:- : workshop }"
+	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
 
 	test ! -z "${_dependencies}" || return 0
 
@@ -73,11 +75,11 @@ workshop ()
 				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
 				if command -v workshop >/dev/null 2>&1
 				then
-					if command -v curl
+					if command -v curl >/dev/null 2>&1
 					then
 						curl --fail -L "${_remote_url}" \
 							2>/dev/null > "${_found_module}" || _code=$?
-					elif command -v wget
+					elif command -v wget >/dev/null 2>&1
 					then
 						wget -qO- "${_remote_url}" \
 							2>/dev/null  > "${_found_module}" || _code=$?
@@ -85,13 +87,18 @@ workshop ()
 						return 127
 					fi
 
-					if test "$(head -n1 "${_found_module}")" = "#!/usr/bin/env workshop" &&
+					_head=
+					test ! -f "${_found_module}" ||
+						_head="$(head -n1 "${_found_module}")"
+
+					if test "${_head}" = "#!/usr/bin/env workshop" &&
 						test "${_code:-0}" = 0 &&
-						sh -n "${_found_module}" >/dev/null 2>&1 &&
+						sh -n "${_found_module}" >/dev/null 2>&1
 					then
 						:
 					else
-						rm "${_found_module}"
+						test ! -f "${_found_module}" ||
+							rm "${_found_module}"
 						return 1
 					fi
 				else
@@ -121,8 +128,8 @@ workshop ()
 	then
 		"${1:-}"
 	else
-		"${@:-}"
+		workshop_executable="${_executable}" "${@:-}"
 	fi
 }
 
-workshop "${0}" "${@:-}"
+test -z "${1:-}" || workshop "${0}" "${@:-}"
