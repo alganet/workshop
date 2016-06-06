@@ -65,6 +65,7 @@ parsed ()
 		cat <<-SEDN
 		i \
 		${*:-}
+
 		SEDN
 	}
 
@@ -73,6 +74,7 @@ parsed ()
 		cat <<-SEDN
 		a \
 		${*:-}
+
 		SEDN
 	}
 
