@@ -99,7 +99,7 @@ posit_parse ()
 								workshop_modules=": workshop ${_module}"
 								unset deps
 
-								$(echo "${_element}")
+								$(printf %s\\n "${_element}")
 
 								set -- "${_module:-}"
 								. "${workshop_executable}"
@@ -120,7 +120,7 @@ posit_parse ()
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
-								$(echo "${_element}")
+								$(printf %s\\n "${_element}")
 							SHELL
 
 							test ${_e} = 0 &&
