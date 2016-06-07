@@ -108,6 +108,8 @@ posit_parse ()
 							test ${_e} = 0 &&
 								echo "ok ${_no}		${_name:-}" ||
 								echo "not ok ${_no}	${_name:-}"
+
+							test ${_e} = 0 && _ok=$((_ok + 1)) || :
 							;;
 						'test' )
 							_no=$(($_no + 1))
@@ -140,5 +142,5 @@ posit_parse ()
 
 	echo "1..${_no}"
 
-	test "${_no}" = "${_ok}"
+	echo test "${_no}" = "${_ok}"
 }
