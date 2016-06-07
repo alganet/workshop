@@ -83,7 +83,7 @@ posit_parse ()
 							_no=$(($_no + 1))
 							_module="${_element_title}"
 							${SHELL:-sh]} \
-							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
+							<<-SHELL >/dev/null 2>&1 && _e=$? || _e=$?
 								set -euf
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
@@ -112,7 +112,7 @@ posit_parse ()
 							_no=$(($_no + 1))
 
 							${SHELL:-sh} \
-							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
+							<<-SHELL >/dev/null 2>&1 && _e=$? || _e=$?
 								set -euf
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
