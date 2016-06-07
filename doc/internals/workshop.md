@@ -5,16 +5,27 @@ be used as a library though. The **posit** tool, part of the workshop
 library, also uses workshop to encapsulate each test run.
 
 Inside tests, you can also start workshop instances and test their
-behavior.
+behavior. This is the main mechanism used for test examples below.
 
 ###### Dispatching workshop with no arguments
 
 Workshop will gracefully do nothing with zero or just one parameter:
 
 [~]:test
-	. "${workshop_executable}"
+	. "${path_to_workshop}"
 
-	workshop && workshop "${PWD}"
+	workshop "${PWD}"
+
+[~]:test
+	. "${path_to_workshop}"
+
+	workshop
+
+Parameters one and two are, respectively, the path to the executable
+that started workshop and the name of the first module to be loaded.
+
+On these samples, we'll use the ${path_to_workshop} variable that
+represents your `workshop` file.
 
 ###### Dispatching an existing module
 
@@ -23,7 +34,7 @@ folder for sibling modules to require.
 
 
 [~]:test
-	. "${workshop_executable}"
+	. "${path_to_workshop}"
 
 	myfunc_dispatched () ( echo 'Hello' )
 
@@ -36,7 +47,7 @@ Missing modules try to be downloaded from the internet. On error,
 workshop will exit.
 
 [~]:test
-	. "${workshop_executable}"
+	. "${path_to_workshop}"
 
 	curl () ( return 1 )
 
@@ -45,7 +56,7 @@ workshop will exit.
 ###### Changing the default server
 
 [~]:test
-	. "${workshop_executable}"
+	. "${path_to_workshop}"
 
 	curl ()
 	{
@@ -58,4 +69,3 @@ workshop will exit.
 		workshop_server='myserver/'
 		workshop "${PWD}" curl_params_mock.sh
 	)"
-

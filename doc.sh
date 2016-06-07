@@ -97,9 +97,9 @@ doc_parse_tokens ()
 	_link_until_open="[^(\"]*"
 	_link="${_link_open}${_link_val}${_link_close}"
 	_bold="$(tput 'bold' || :)"
-	_reset="$(tput 'sgr0' || :)"
 	_rev="$(tput 'rev' || :)"
 	_dim="$(tput 'dim' || :)"
+	_reset="$(tput 'sgr0' || :)" # Reset last to avoid debug color bleed
 }
 
 doc_parse_draw ()

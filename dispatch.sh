@@ -40,15 +40,15 @@ dispatch ()
 	if command -v 'dispatch' >/dev/null 2>&1
 	then :
 	else
-		"${@:-}" && _code=$? || _code=$?
+		"${@:-}" && _e=$? || _e=$?
 
-		if test "${_code}" = '127'
+		if test "${_e}" = '127'
 		then
 			"${_ns}_dispatched" "${_arg}"
 			return $?
 		fi
 
-		return ${_code}
+		return ${_e}
 	fi
 
 	if command -v "${1}" >/dev/null 2>&1

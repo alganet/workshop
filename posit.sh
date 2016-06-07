@@ -47,53 +47,81 @@ posit_parse ()
 				;;
 			'h5' )
 				echo "##### ${_element_line##*	}"
+				_element_heading="${_element_line##*	}"
 				;;
 			'h4' )
 				echo "#### ${_element_line##*	}"
+				_element_heading="${_element_line##*	}"
 				;;
 			'h3' )
 				echo "### ${_element_line##*	}"
+				_element_heading="${_element_line##*	}"
 				;;
 			'h2' )
 				echo ""
 				echo "## ${_element_line##*	}"
 				echo ""
+				_element_heading="${_element_line##*	}"
 				;;
 			'h1' )
 				echo ""
 				echo "# ${_element_line##*	}"
 				echo ""
+				_element_heading="${_element_line##*	}"
 				;;
 			'code' )
-				_element="${_element:-}${_element:+${_n}}${_element_line##*	}"
+				_element="${_element:-}${_element:+${_n}}"
+				_element="${_element}${_element_line##*	}"
 				;;
 			'' )
 				if test ! -z "${_element:-}"
 				then
-					case "${_element_href:-}" in
-						'test:module' )
+					_name="${_element_heading:-}"
+					case ${_element_href:-} in
+						'test:module'* )
 							_no=$(($_no + 1))
-							workshop_executable="${workshop_executable}" ${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
+							_module="${_element_title}"
+							path_to_workshop="${workshop_executable}" \
+							${SHELL:-sh]} \
+							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
 								set -euf
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
 
-								require () ( workshop_dependencies="${workshop_dependencies:-}${workshop_dependencies:+}\${1}" )
+								require ()
+								{
+									_deps="${_deps:-}${_deps:+}\${1}"
+								}
+
+								workshop_dependencies="${deps:-}"
+								workshop_modules=": workshop ${_module}"
+								unset deps
 
 								$(echo "${_element}")
 
-								set -- "${_element_title:-}"
+								set -- "${_module:-}"
 								. "${workshop_executable}"
 							SHELL
+
+							test ${_e} = 0 &&
+								echo "ok ${_no}		${_name:-}" ||
+								echo "not ok ${_no}	${_name:-}"
 							;;
 						'test' )
 							_no=$(($_no + 1))
-							workshop_executable="${workshop_executable}" ${SHELL:-sh} <<-SHELL && echo "ok ${_no}		${_element_heading:-}" || echo "not ok ${_no}	${_element_heading:-}"
+
+							path_to_workshop="${workshop_executable}" \
+							${SHELL:-sh} \
+							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
 								set -euf
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
 								$(echo "${_element}")
 							SHELL
+
+							test ${_e} = 0 &&
+								echo "ok ${_no}		${_name:-}" ||
+								echo "not ok ${_no}	${_name:-}"
 							;;
 					esac
 					_element=

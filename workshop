@@ -8,7 +8,8 @@ workshop ()
 	_input="${2##*-}"
 	_input="${_input##*-}"
 	_main="$(basename "${_input}")"
-	_server="${workshop_server:-https://raw.githubusercontent.com/alganet/workshop/master/}"
+	_master="https://raw.githubusercontent.com/alganet/workshop/master/"
+	_server="${workshop_server:-${_master}}"
 	shift 2
 
 	set -euf
@@ -75,11 +76,13 @@ workshop ()
 					if command -v curl >/dev/null 2>&1
 					then
 						curl --fail -L "${_remote_url}" \
-							2>/dev/null > "${_found_module}" || _code=$?
+							2>/dev/null > "${_found_module}" ||
+								_code=$?
 					elif command -v wget >/dev/null 2>&1
 					then
 						wget -qO- "${_remote_url}" \
-							2>/dev/null  > "${_found_module}" || _code=$?
+							2>/dev/null  > "${_found_module}" ||
+								_code=$?
 					else
 						return 127
 					fi
@@ -90,7 +93,7 @@ workshop ()
 
 					if test "${_head}" = "#!/usr/bin/env workshop" &&
 						test "${_code:-0}" = 0 &&
-						sh -n "${_found_module}" >/dev/null 2>&1
+						"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
 					then
 						:
 					else
@@ -110,7 +113,7 @@ workshop ()
 				_required="${_required:-} ${*:-} "
 			}
 
-			sh -n "${_found_module}" >/dev/null 2>&1
+			"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
 
 			. "${_found_module}"
 
