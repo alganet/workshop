@@ -66,6 +66,6 @@ workshop will exit.
 
 	test '--fail -L myserver/curl_params_mock.sh' = "$(
 		cd /tmp
-		workshop_server='myserver/'
+		export workshop_server='myserver'
 		workshop "${PWD}" curl_params_mock.sh
 	)"
