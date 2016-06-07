@@ -82,10 +82,10 @@ posit_parse ()
 						'test:module' )
 							_no=$(($_no + 1))
 							_module="${_element_title}"
-							path_to_workshop="${workshop_executable}" \
 							${SHELL:-sh]} \
 							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
 								set -euf
+								path_to_workshop=\"${workshop_executable}\"
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
 
@@ -111,10 +111,10 @@ posit_parse ()
 						'test' )
 							_no=$(($_no + 1))
 
-							path_to_workshop="${workshop_executable}" \
 							${SHELL:-sh} \
 							<<-SHELL 2>&1 >/dev/null && _e=$? || _e=$?
 								set -euf
+								path_to_workshop=\"${workshop_executable}\"
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
 								$(echo "${_element}")
