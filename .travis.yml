@@ -1,7 +1,7 @@
 before_install:
   - "$DEPS"
 script:
-  - "$TARGET_SH" workshop posit.sh run .
+  - $TARGET_SH workshop posit.sh run .
 matrix:
   include:
     - env: TARGET_SH="dash" DEPS=":"
