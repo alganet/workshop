@@ -27,7 +27,6 @@ posit_parse ()
 	_ok=0
 	_n="
 "
-
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
@@ -142,5 +141,5 @@ posit_parse ()
 
 	echo "1..${_no}"
 
-	echo test "${_no}" = "${_ok}"
+	test "${_no}" = "${_ok}"
 }
