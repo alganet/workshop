@@ -24,6 +24,7 @@ posit_code_elements ()
 posit_parse ()
 {
 	_no=0
+	_ok=0
 	_n="
 "
 
@@ -123,6 +124,8 @@ posit_parse ()
 							test ${_e} = 0 &&
 								echo "ok ${_no}		${_name:-}" ||
 								echo "not ok ${_no}	${_name:-}"
+
+							test ${_e} = 0 _ok=$((_ok + 1))
 							;;
 					esac
 					_element=
@@ -134,5 +137,8 @@ posit_parse ()
 				;;
 		esac
 	done
+
 	echo "1..${_no}"
+
+	test "${_no}" = "${_ok}"
 }
