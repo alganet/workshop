@@ -1,6 +1,6 @@
 sudo: required
 before_install:
-  - "$DEPS"
+  - eval "$DEPS"
 script:
   - $TARGET_SH workshop posit.sh run .
 matrix:
@@ -14,32 +14,32 @@ matrix:
     - env: TARGET_SH="bash" DEPS=":"
       os:  osx
 
-    - env: TARGET_SH="posh" DEPS="sudo apt-get -qq update; sudo apt-get install -y posh"
+    - env: TARGET_SH="posh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y posh"
       os:  linux
 
-    - env: TARGET_SH="mksh" DEPS="sudo apt-get -qq update; sudo apt-get install -y mksh"
+    - env: TARGET_SH="mksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y mksh"
       os:  linux
 
-    - env: TARGET_SH="zsh" DEPS="sudo apt-get -qq update; sudo apt-get install -y zsh"
+    - env: TARGET_SH="zsh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y zsh"
       os:  linux
 
-    - env: TARGET_SH="pdksh" DEPS="sudo apt-get -qq update; sudo apt-get install -y pdksh"
+    - env: TARGET_SH="pdksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y pdksh"
       os:  linux
 
-    - env: TARGET_SH="yash" DEPS="sudo apt-get -qq update; sudo apt-get install -y yash"
+    - env: TARGET_SH="yash" DEPS="sudo apt-get -qq update ; sudo apt-get install -y yash"
       os:  linux
 
-    - env: TARGET_SH="ksh" DEPS="sudo apt-get -qq update; sudo apt-get install -y ksh"
+    - env: TARGET_SH="ksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y ksh"
       os:  linux
 
-    - env: TARGET_SH="zsh-beta" DEPS="sudo apt-get -qq update; sudo apt-get install -y zsh-beta"
+    - env: TARGET_SH="zsh-beta" DEPS="sudo apt-get -qq update ; sudo apt-get install -y zsh-beta"
       os:  linux
 
-    - env: TARGET_SH="zsh" DEPS="brew update; brew install zsh"
+    - env: TARGET_SH="zsh" DEPS="brew update ; brew install zsh"
       os:  osx
 
-    - env: TARGET_SH="ksh" DEPS="brew update; brew install ksh"
+    - env: TARGET_SH="ksh" DEPS="brew update ; brew install ksh"
       os:  osx
 
-    - env: TARGET_SH="mksh" DEPS="brew update; brew install mksh"
+    - env: TARGET_SH="mksh" DEPS="brew update ; brew install mksh"
       os:  osx
