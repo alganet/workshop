@@ -77,8 +77,9 @@ posit_parse ()
 				if test ! -z "${_element:-}"
 				then
 					_name="${_element_heading:-}"
-					case ${_element_href:-} in
-						'test:module'* )
+					_type="${_element_href:-}"
+					case ${_type%% *} in
+						'test:module' )
 							_no=$(($_no + 1))
 							_module="${_element_title}"
 							path_to_workshop="${workshop_executable}" \
