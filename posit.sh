@@ -140,7 +140,7 @@ posit_parse ()
 	done
 
 	echo "1..${_no}"
-
+	set -x
 	test "${_no}" = "${_ok}"
 	exit $?
 }
