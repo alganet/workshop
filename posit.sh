@@ -84,7 +84,7 @@ posit_parse ()
 							_no=$(($_no + 1))
 							_module="${_element_title}"
 							set +e
-							_test_out="$(sh <<-SHELL 2>&1
+							_test_out="$(sh <<-EXTERNALMODULE 2>&1
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -103,7 +103,7 @@ posit_parse ()
 
 								set -- "${_module:-}"
 								. "${workshop_executable}"
-							SHELL
+							EXTERNALMODULE
 							)"
 							_e=$?
 							${_errmode}
@@ -119,13 +119,13 @@ posit_parse ()
 							_no=$(($_no + 1))
 
 							set +e
-							_test_out="$(sh <<-SHELL 2>&1
+							_test_out="$(sh <<-EXTERNALSHELL 2>&1
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
 								set -x
 								$(printf %s\\n "${_element}")
-							SHELL
+							EXTERNALSHELL
 							)"
 							_e=$?
 							${_errmode}
