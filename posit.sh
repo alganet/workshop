@@ -125,7 +125,7 @@ posit_parse ()
 								echo "ok ${_no}		${_name:-}" ||
 								echo "not ok ${_no}	${_name:-}"
 
-							test ${_e} = 0 _ok=$((_ok + 1))
+							test ${_e} = 0 && _ok=$((_ok + 1)) || :
 							;;
 					esac
 					_element=
