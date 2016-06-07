@@ -128,7 +128,8 @@ workshop ()
 	then
 		"${1:-}"
 	else
-		workshop_executable="${_executable}" "${@:-}"
+		export workshop_executable="${_executable}"
+		"${@:-}"
 	fi
 }
 
