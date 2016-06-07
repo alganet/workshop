@@ -23,6 +23,7 @@ posit_code_elements ()
 
 posit_parse ()
 {
+	_errmode="$(set +o)"
 	_no=0
 	_ok=0
 	_n="
@@ -82,9 +83,8 @@ posit_parse ()
 						'test:module' )
 							_no=$(($_no + 1))
 							_module="${_element_title}"
-							${SHELL:-sh]} \
-							<<-SHELL >/dev/null 2>&1 && _e=$? || _e=$?
-								set -euf
+							set +e
+							_test_out="$(sh <<-SHELL 2>&1
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -97,36 +97,45 @@ posit_parse ()
 								workshop_dependencies="${deps:-}"
 								workshop_modules=": workshop ${_module}"
 								unset deps
+								set -x
 
 								$(printf %s\\n "${_element}")
 
 								set -- "${_module:-}"
 								. "${workshop_executable}"
 							SHELL
+							)"
+							_e=$?
+							${_errmode}
 
 							test ${_e} = 0 &&
 								echo "ok ${_no}		${_name:-}" ||
 								echo "not ok ${_no}	${_name:-}"
 
-							test ${_e} = 0 && _ok=$(($_ok + 1)) || :
+							test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+								echo "${_test_out:-}"
 							;;
 						'test' )
 							_no=$(($_no + 1))
 
-							${SHELL:-sh} \
-							<<-SHELL >/dev/null 2>&1 && _e=$? || _e=$?
-								set -euf
+							set +e
+							_test_out="$(sh <<-SHELL 2>&1
 								path_to_workshop=${workshop_executable}
 								unsetopt NO_MATCH  >/dev/null 2>&1 || :
 								setopt SHWORDSPLIT >/dev/null 2>&1 || :
+								set -x
 								$(printf %s\\n "${_element}")
 							SHELL
+							)"
+							_e=$?
+							${_errmode}
 
 							test ${_e} = 0 &&
 								echo "ok ${_no}		${_name:-}" ||
 								echo "not ok ${_no}	${_name:-}"
 
-							test ${_e} = 0 && _ok=$(($_ok + 1)) || :
+							test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+								echo "${_test_out:-}"
 							;;
 					esac
 					_element=
@@ -140,7 +149,6 @@ posit_parse ()
 	done
 
 	echo "1..${_no}"
-	set -x
 	test "${_no}" = "${_ok}"
 	exit $?
 }

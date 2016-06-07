@@ -128,7 +128,7 @@ workshop ()
 	then
 		"${1:-}"
 	else
-		export workshop_executable="${_executable}"
+		workshop_executable="$PWD/${_executable}"
 		"${@:-}"
 	fi
 }
