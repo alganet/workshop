@@ -129,11 +129,11 @@ posit_parse ()
 			_name="${_on_prompt:-}"
 			_element="$(
 				printf %s "${_element}" |
-				sed 's/^[ \t]*//;s/[ \t]*$//'
+				sed 's/^[	 ]*//;s/[	 ]*$//'
 			)"
 			_on_prompt="$(
 				printf %s "${_on_prompt}" |
-				sed 's/^[ \t]*//;s/[ \t]*$//'
+				sed 's/^[	 ]*//;s/[	 ]*$//'
 			)"
 			_no=$(($_no + 1))
 
