@@ -100,7 +100,7 @@ posit_parse ()
 							echo "not ok ${_no}	${_name:-}"
 
 						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-							echo "${_test_out:-}" | tail -n 10
+							echo "${_test_out:-}" | tail -n 100
 
 						_current_prompt=
 						_element=
@@ -147,7 +147,7 @@ posit_parse ()
 				echo "not ok ${_no}	${_name:-}"
 
 			test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-				echo "${_test_out:-}" | tail -n 10
+				echo "${_test_out:-}" | tail -n 100
 
 			_on_prompt=
 			_element=
@@ -182,7 +182,7 @@ posit_parse ()
 							echo "not ok ${_no}	${_name:-}"
 
 						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-							echo "${_test_out:-}" | tail -n 10
+							echo "${_test_out:-}" | tail -n 100
 						fi
 					;;
 				'test' )
@@ -198,7 +198,7 @@ posit_parse ()
 						echo "not ok ${_no}	${_name:-}"
 
 					test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-						echo "${_test_out:-}" | tail -n 10
+						echo "${_test_out:-}" | tail -n 100
 					;;
 			esac
 			_element=
