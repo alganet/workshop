@@ -7,8 +7,7 @@ dispatch ()
 
 	if test '_' = '_'${_arg}
 	then
-		"${_ns}_dispatched"
-		return $?
+		return 0
 	fi
 
 	_short="${_arg#*-}"
@@ -37,31 +36,5 @@ dispatch ()
 
 	set -- "${_target}" "${@:-}"
 
-	if command -v 'dispatch' >/dev/null 2>&1
-	then :
-	else
-		"${@:-}" && _e=$? || _e=$?
-
-		if test "${_e}" = '127'
-		then
-			"${_ns}_dispatched" "${_arg}"
-			return $?
-		fi
-
-		return ${_e}
-	fi
-
-	if command -v "${1}" >/dev/null 2>&1
-	then
-		"${@:-}"
-		return $?
-	fi
-
-	if command -v "${_ns}_dispatched" >/dev/null 2>&1
-	then
-		"${_ns}_dispatched" "${_arg}"
-		return $?
-	fi
-
-	return 127
+	"${@:-}"
 }
