@@ -174,6 +174,7 @@ posit_bootstrap_command ()
 			set -x
 			PATH="\${PATH}:." \
 			workshop_path="${workshop_path:-}" \
+			workshop_unsafe=1 \
 			workshop_executable="${workshop_executable}" \
 			${_on_prompt}
 		)"
@@ -187,6 +188,7 @@ posit_bootstrap_test ()
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
 		PATH="\${PATH}:."
+		workshop_unsafe=1
 		workshop_path="${workshop_path:-}"
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :

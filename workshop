@@ -52,7 +52,8 @@ workshop ()
 	shift 2 # Remove first two arguments, remaining are module arguments
 
 	# Fail on errors and undefined variables. Don't expand glob patterns
-	set -euf
+	test -z "${workshop_unsafe:-}" || set -e
+	set -uf
 
 	# Don't expand glob patterns on zsh
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
