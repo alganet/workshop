@@ -179,7 +179,8 @@ posit_bootstrap_command ()
 		set -x
 		workshop ()
 		{
-			. "\${path_to_workshop}" "\${@:-}"
+			set -- "\${@:-}"
+			. "\${path_to_workshop}"
 		}
 		workshop_path="${workshop_path:-}"
 		path_to_workshop="${workshop_executable}"
