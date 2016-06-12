@@ -59,3 +59,41 @@
 	$ workshop posit run cat_display.md
 	ok 1		cat hello.txt
 	1..1
+
+## Workshop invokation
+
+[~]:test
+	set -- # No Arguments
+	. ./workshop
+
+## Running Modules
+
+[~]:file:mymodule.sh
+	#!/usr/bin/env workshop
+
+	mymodule ()
+	{
+		echo 'Hello'
+	}
+
+[~]:test
+	$ workshop mymodule
+	Hello
+
+## Requiring Dependencies
+
+[~]:file:anothermodule.sh
+	#!/usr/bin/env workshop
+
+	require 'mymodule'
+
+	anothermodule ()
+	{
+		mymodule
+	}
+
+[~]:test
+	$ workshop anothermodule
+	Hello
+
+---

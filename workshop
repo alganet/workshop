@@ -8,7 +8,7 @@
 workshop ()
 {
 	# Workshop needs at least two arguments to work
-	if test "${#}" -lt 2
+	if test -z "${2:-}"
 	then
 		return 0
 	fi

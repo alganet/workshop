@@ -1,2 +1,5 @@
-[![Linux and OS X Build Status](https://travis-ci.org/alganet/workshop.svg?branch=master)](https://travis-ci.org/alganet/workshop)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/1vvrvlk9ss45h0ga?svg=true)](https://ci.appveyor.com/project/alganet/workshop-fat52)
+**workshop** is a set of shell script tools that work everywhere.
+
+[![Linux and OS X Build Status](https://img.shields.io/travis/alganet/workshop.svg?label=Linux+/+OS+X+Builds)](https://travis-ci.org/alganet/workshop) [![Windows Build status](https://img.shields.io/appveyor/ci/alganet/workshop.svg?label=Windows+Builds)](https://ci.appveyor.com/project/alganet/workshop-fat52)
+
+---

@@ -7,6 +7,26 @@
 #
 parsed ()
 {
+	_file="${TMPDIR:-/tmp}/parsed.sh/${1:-true}"
+
+	if test -f "${_file}"
+	then
+		# Runs cached parser
+		sed -n -f "${_file}"
+	else
+		# Builds the parser, quits at the end
+		_parser="$(parsed_create;${1:-:};quit)"
+
+		# Saves it
+		printf %s "${_parser}" > "${_file}"
+
+		# Runs it
+		sed -n "${_parser}"
+	fi
+}
+
+parsed_create ()
+{
 	# Logs the buffer (for testing purpouses)
 	debug ()   ( printf %s\\n '	l' )
 	# Defines a sed label
@@ -128,11 +148,5 @@ parsed ()
 		:_replaceall_${1}_end
 		SEDN
 	}
-
-	# Builds the parser, quits at the end
-	_parser="$(${1:-:};quit)"
-
-	# Outputs it
-	sed -n "${_parser}"
 }
 
