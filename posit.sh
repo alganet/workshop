@@ -107,11 +107,11 @@ posit_run ()
 			_name="${_on_prompt:-}"
 			_element="$(
 				printf %s "${_element}" |
-				sed 's/[	 ]*$//'
+				sed 's/^[ \t]*//;s/[ \t]*$//'
 			)"
 			_on_prompt="$(
 				printf %s "${_on_prompt}" |
-				sed 's/[	 ]*$//'
+				sed 's/^[ \t]*//;s/[ \t]*$//'
 			)"
 			_no=$(($_no + 1))
 
