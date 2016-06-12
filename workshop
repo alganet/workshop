@@ -8,7 +8,7 @@ workshop ()
 		return 0
 	fi
 
-	_executable="${1:-}"
+	_executable="${workshop_executable:-${1}}"
 	_executable_dir="$(dirname "${workshop_executable:-$_executable}")"
 	_input="${2##*-}" # Remove trailing dashes
 	_main="$(basename "${_input}")"
