@@ -126,9 +126,10 @@ posit_run ()
 			_namespace="${_element_href:-}"
 			_type="${_namespace%%:*}"
 			_value="${_namespace##*:}"
+			_file="$(basename "${_value}")"
 			case ${_type%% *} in
 				'file' )
-					printf %s\\n "${_element}" > "$(basename "${_value}")"
+					printf %s\\n "${_element}" > "${_file}"
 					;;
 				'test' )
 					_no=$(($_no + 1))
@@ -169,7 +170,6 @@ posit_bootstrap_command ()
 		set -x
 		PATH="\${PATH}:."
 		workshop_path="${workshop_path:-}"
-		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -185,7 +185,6 @@ posit_bootstrap_test ()
 		set -x
 		PATH="\${PATH}:."
 		workshop_path="${workshop_path:-}"
-		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :

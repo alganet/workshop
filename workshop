@@ -17,7 +17,7 @@ workshop ()
 	_executable="${workshop_executable:-${1}}"
 
 	# Directory in which the workshop executable resides
-	workshop_dir="$(dirname "${_executable}")"
+	_executable_dir="$(dirname "${_executable}")"
 
 	# Input module name or file path. Trim dashes from beginning.
 	_input="${2##*-}"
@@ -41,11 +41,11 @@ workshop ()
 	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
 
 	# Path to look for other modules
-	workshop_path="${workshop_path:-${PWD}:${workshop_dir}}"
+	workshop_path="${workshop_path:-${PWD}:${_executable_dir}}"
 
 	# Absolute path to the executable that started workshop
 	workshop_executable="$(
-		cd "${workshop_dir}";pwd
+		cd "${_executable_dir}";pwd
 	)/$(
 		basename "${_executable}"
 	)"
@@ -114,10 +114,15 @@ workshop ()
 			# If no module has been found, try to donwload it
 			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
-			    _temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null)"
+			    _temp_dir="$(
+			    	mktemp -d \
+			    	"${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null
+		    	)"
 			    if test -z "${_temp_dir}"
 				then
-					_temp_dir="${TMPDIR:-/tmp}/workshop."$(od -An -N2 -i /dev/random)
+					_temp_dir="${TMPDIR:-/tmp}/workshop."$(
+						od -An -N2 -i /dev/random
+					)
 				    mkdir -m 700 "${_temp_dir}"
 				fi
 				_remote_url="${_server}${_dependency}.sh"
