@@ -170,6 +170,7 @@ posit_bootstrap_command ()
 			. "\${workshop_executable}" "\${@:-}"
 		}
 		workshop_path="${workshop_path:-}"
+		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -183,6 +184,8 @@ posit_bootstrap_test ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
+		workshop_path="${workshop_path:-}"
+		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
