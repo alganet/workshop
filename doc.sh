@@ -1,23 +1,20 @@
 #!/usr/bin/env workshop
 
-require 'dispatch.sh' 'parsed.sh'
+require 'dispatch' 'parsed'
 
+# Parses Markdown documents to a element list
 doc ()
 {
 	dispatch 'doc' "${@:-README.md}"
 }
 
-
-doc_dispatched ()
-{
-	doc_command_show "${@:-README.md}"
-}
-
+# Displays a Markdown document friendly to terminal output
 doc_command_show ()
 {
 	doc_command_elements "${@:-}" | parsed doc_parse_draw
 }
 
+# Returns a parsed list of elements from a Markdown file
 doc_command_elements ()
 {
 	_file="${1:-README.md}"
@@ -27,6 +24,7 @@ doc_command_elements ()
 		parsed doc_parse_elements | doc_filter "${@:-}"
 }
 
+# Filters out elements from a element list
 doc_filter ()
 {
 	_selector="${1:-*}"
@@ -37,42 +35,47 @@ doc_filter ()
 	while IFS='' read -r _line
 	do
 		case "${_line%%	*}" in
-		'@name'|'@href'|'@title'|'@class' )
-			_meta="${_meta:-}${_meta:+${_n}}${_line}"
-			;;
-		[a-z]* )
-			if test '*' = "${_selector}"
-			then
-				_element=1
-				test -z "${_meta}" || echo "${_meta}
-"
-				echo "${_line}"
-			else
-				_ifs="${IFS}"
-				IFS=','
-				_current="${_line%%	*}"
-				for _sel in ${_selector}
-				do
-					if test "${_sel}" = "${_current}"
-					then
-						_element=1
-						test -z "${_meta}" || echo "${_meta}
+			# Meta elements not visible
+			'@name'|'@href'|'@title'|'@class' )
+				_meta="${_meta:-}${_meta:+${_n}}${_line}"
+				;;
+			# Other elements
+			[a-z]* )
+				if test '*' = "${_selector}"
+				then
+					_element=1
+					test -z "${_meta}" || echo "${_meta}
 	"
-						echo "${_line}"
-					fi
-				done
-				IFS="${_ifs}"
-			fi
-			_meta=
-			;;
-		'' )
-			test -z "${_element:-}" || echo "${_line}"
-			_element=
-			;;
+					echo "${_line}"
+				else
+					# Iterates over selectors to find a match
+					_ifs="${IFS}"
+					IFS=','
+					_current="${_line%%	*}"
+					for _sel in ${_selector}
+					do
+						if test "${_sel}" = "${_current}"
+						then
+							_element=1
+							test -z "${_meta}" || echo "${_meta}
+		"
+							echo "${_line}"
+						fi
+					done
+					IFS="${_ifs}"
+				fi
+				_meta=
+				;;
+			# An element separator
+			'' )
+				test -z "${_element:-}" || echo "${_line}"
+				_element=
+				;;
 		esac
 	done
 }
 
+# Declares tokens used for parsing
 doc_parse_tokens ()
 {
 	_h1='# '
@@ -102,10 +105,12 @@ doc_parse_tokens ()
 	_reset="$(tput 'sgr0' || :)" # Reset last to avoid debug color bleed
 }
 
+# Draws an element list back as a Markdown document formatted for tty
 doc_parse_draw ()
 {
 	doc_parse_tokens
 
+	# A list of elements
 	context 'list'
 		ifmatch "${_blank}" enter 'element_end'
 		ifmatch "@${_anychar}*	" enter 'meta'
@@ -115,6 +120,7 @@ doc_parse_draw ()
 		ifend quit
 		enter 'list'
 
+	# An element
 	context 'element'
 		ifmatch "h1	" enter 'h1'
 		ifmatch "h2	" enter 'h2'
@@ -125,6 +131,7 @@ doc_parse_draw ()
 		next
 		enter 'list'
 
+	# Draw H1 as set-atx style
 	context 'h1'
 		replace "h1	" ''
 		replace "\(.*\)$" "${_bold}\1${_reset}"
@@ -139,6 +146,7 @@ doc_parse_draw ()
 		next
 		enter 'list'
 
+	# Draw H2 as set-atx style
 	context 'h2'
 		replace "h2	" ''
 		replace "\(.*\)$" "${_bold}\1${_reset}"
@@ -153,39 +161,46 @@ doc_parse_draw ()
 		next
 		enter 'list'
 
+	# Draws code blocks
 	context 'code'
 		replace "code	" ''
 		enter 'codepad'
 
+	# Pads code blocks to align up terminal colors
 	context 'codepad'
 		replace '	' '    '
-		ifnotmatchall '.\{72\}' enter 'codereplace'
+		ifnotmatchall '.\{72\}' enter 'codepadreplace'
 		enter 'codepaint'
-
-	context 'codereplace'
+	context 'codepadreplace'
 		replace '$' ' '
 		enter 'codepad'
 
+	# Paints a code line
 	context 'codepaint'
 		replace ".*" "${_dim}${_rev}    ${_reset}${_rev}&${_reset}"
 		print
 		next
 		enter 'list'
 
+	# Ignores invisible elements
 	context 'meta'
 		next
 		ifmatch "${_blank}" enter 'meta'
 		enter 'list'
 
+	# The end of an element
 	context 'element_end'
 		print
 		next
 		enter 'list'
 }
 
+# Parses Markdown input to an element list using the parsed DSL
 doc_parse_elements ()
 {
 	doc_parse_tokens
+
+	# Overall format for ``` and ~~~ fences
 	fence ()
 	{
 		context "${1}"
@@ -218,6 +233,7 @@ doc_parse_elements ()
 			enter 'text'
 	}
 
+	# Overall format for atx headings
 	heading ()
 	{
 		context "${1}"
@@ -237,6 +253,7 @@ doc_parse_elements ()
 			enter 'text'
 	}
 
+	# Different list of blocks that can appear
 	blocks ()
 	{
 		ifmatch "${_h1}"      enter "h1"
@@ -253,13 +270,14 @@ doc_parse_elements ()
 		ifmatch "${_link}"    enter "ref"
 	}
 
-
+	# Unspecified text
 	context 'text'
 		blocks
 		ifmatch "${_anychar}" enter 'paragraph'
 		ifend quit
 		enter 'text'
 
+	# A link reference
 	context 'ref'
 		remove "${_link_open}"
 		detach '@name' "${_link_val}"
@@ -269,6 +287,7 @@ doc_parse_elements ()
 		append
 		enter 'text'
 
+	# The title of a link reference
 	context 'reftitle'
 		remove "${_title_open}"
 		detach '@title' "${_title_val}"
@@ -276,16 +295,19 @@ doc_parse_elements ()
 		append
 		enter 'text'
 
+	# A blank line
 	context 'blank'
 		delete
 		enter 'text'
 
+	# A paragraph
 	context 'paragraph'
 		line 'text'
 		ifmatch "${_blank}" enter 'paragraph'
 		blocks
 		enter 'paragraph'
 
+	# Indented code
 	context 'indent'
 		grind 'code' "${_indent}"
 		ifmatch "${_blank}" enter 'indent'
@@ -294,6 +316,7 @@ doc_parse_elements ()
 		blocks
 		enter 'text'
 
+	# Tabbed code
 	context 'tabbed'
 		grind 'code' "${_tabbed}"
 		ifmatch "${_blank}" enter 'tabbed'
