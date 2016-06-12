@@ -34,8 +34,13 @@ posit_run ()
 	_n="
 "
 	_current_dir="$(pwd)"
-	mkdir -p /tmp/posit
-	cd /tmp/posit
+    _temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/posit.XXXXXX" 2>/dev/null)"
+    if test -z "${_temp_dir}"
+	then
+		_temp_dir="${TMPDIR:-/tmp}/posit."$(od -An -N2 -i /dev/random)
+	    mkdir -m 700 "${_temp_dir}"
+	fi
+	cd "${_temp_dir}"
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
@@ -139,6 +144,7 @@ posit_run ()
 		fi
 	done
 	cd "${_current_dir}"
+	rm -Rf "${_temp_dir}"
 
 	echo "1..${_no}"
 	test "${_no}" = "${_ok}"
@@ -157,7 +163,7 @@ posit_report ()
 
 posit_bootstrap_command ()
 {
-	sh <<-EXTERNALSHELL 2>&1
+	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
 		workshop ()
 		{
@@ -175,7 +181,7 @@ posit_bootstrap_command ()
 
 posit_bootstrap_test ()
 {
-	sh <<-EXTERNALSHELL 2>&1
+	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
 		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
