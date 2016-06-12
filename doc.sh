@@ -96,10 +96,10 @@ doc_parse_tokens ()
 	_link_close='\]:'
 	_link_until_open="[^(\"]*"
 	_link="${_link_open}${_link_val}${_link_close}"
-	_bold="$(tput 'bold' || :)"
-	_rev="$(tput 'rev' || :)"
-	_dim="$(tput 'dim' || :)"
-	_reset="$(tput 'sgr0' || :)" # Reset last to avoid debug color bleed
+	_bold="$(tput 'bold' 2>/dev/null || :)"
+	_rev="$(tput 'rev' 2>/dev/null || :)"
+	_dim="$(tput 'dim' 2>/dev/null || :)"
+	_reset="$(tput 'sgr0' 2>/dev/null || :)" # Reset last to avoid debug color bleed
 }
 
 doc_parse_draw ()

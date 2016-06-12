@@ -1,7 +1,7 @@
 sudo: required
 before_install:
   - ${APTKEY:+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "$APTKEY"}
-  - ${PPA:+echo "deb ${PPA} main" | sudo tee "/etc/apt/sources.list.d/bash.list"}
+  - ${PPA:+echo "deb http://ppa.launchpad.net/${PPA}/ubuntu main" | sudo tee -a "/etc/apt/sources.list"}
   - ${APTGET:+sudo apt-get update}
   - ${APTGET:+sudo apt-get install -y ${APTGET}}
   - ${BREW:+brew update}

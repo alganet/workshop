@@ -6,14 +6,24 @@ deploy: off
 environment:
   matrix:
     - SHELL: bash
+      PACMAN: bash
+      SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: dash
+      PACMAN: dash
+      SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: mksh
+      PACMAN: mksh
+      SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: ksh
+      PACMAN: ksh
+      SHELLENV: C:\msys64\usr\bin\bash
+    - SHELL: bash
+      SHELLENV: C:\MinGW\msys\1.0\bin\sh
 
 install:
-  - cmd: C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
-  - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
-  - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S $SHELL"
+  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
+  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
+  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
 
 test_script:
-  - cmd: C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
+  - cmd: %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
