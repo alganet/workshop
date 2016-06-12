@@ -1,7 +1,9 @@
 sudo: required
 before_install:
-  - eval "${APTGET:+sudo apt-get -qq update ; sudo apt-get install -y ${APTGET}}"
-  - eval "${BREW:+brew update ; brew install  ${BREW}}"
+  - ${APTGET:+sudo apt-get -qq update}
+  - ${APTGET:+sudo apt-get install -y ${APTGET}}
+  - ${BREW:+brew update}
+  - ${BREW:+brew install  ${BREW}}
 script:
   - $SHELL workshop posit run .
 matrix:
