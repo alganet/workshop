@@ -16,5 +16,4 @@ install:
   - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S $SHELL"
 
 test_script:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - cmd: C:\msys64\usr\bin\bash -lc "$SHELL workshop posit run ."
+  - cmd: C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
