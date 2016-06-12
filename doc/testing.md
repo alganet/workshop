@@ -12,7 +12,7 @@
 
 ---
 
-	$ ./workshop posit run welcoming_the_world.md
+	$ workshop posit run welcoming_the_world.md
 	ok 1		echo Hello World
 	ok 2		echo Ola Mundo
 	1..2
@@ -32,7 +32,7 @@
 
 ---
 
-	$ ./workshop posit run functions.md
+	$ workshop posit run functions.md
 	ok 1		Creating Functions
 	1..1
 
@@ -56,6 +56,6 @@
 
 ---
 
-	$ ./workshop posit run cat_display.md
+	$ workshop posit run cat_display.md
 	ok 1		cat hello.txt
 	1..1

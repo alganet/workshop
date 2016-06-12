@@ -167,6 +167,7 @@ posit_bootstrap_command ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
+		PATH="\${PATH}:."
 		workshop_path="${workshop_path:-}"
 		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
@@ -182,6 +183,7 @@ posit_bootstrap_test ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
+		PATH="\${PATH}:."
 		workshop_path="${workshop_path:-}"
 		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
