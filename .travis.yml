@@ -1,7 +1,6 @@
 sudo: required
 before_install:
-  - ${APTKEY:+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "$APTKEY"}
-  - ${PPA:+echo "deb http://ppa.launchpad.net/${PPA}/ubuntu precise main" | sudo tee -a "/etc/apt/sources.list"}
+  - ${PPA:+sudo add-apt-repository ppa:${PPA} -y}
   - ${APTGET:+sudo apt-get update}
   - ${APTGET:+sudo apt-get install -y ${APTGET}}
   - ${BREW:+brew update}
@@ -52,14 +51,14 @@ matrix:
     - env: SHELL="dash" BREW="dash"
       os:  osx
 
-    - env: SHELL="bash2.05b" APTGET="bash2.05b" PPA="agriffis/bashes" APTKEY="F5751EC8"
+    - env: SHELL="bash2.05b" APTGET="bash2.05b" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash3.0.16" APTGET="bash3.0.16" PPA="agriffis/bashes" APTKEY="F5751EC8"
+    - env: SHELL="bash3.0.16" APTGET="bash3.0.16" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash3.2.48" APTGET="bash3.2.48" PPA="agriffis/bashes" APTKEY="F5751EC8"
+    - env: SHELL="bash3.2.48" APTGET="bash3.2.48" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash4.2.45" APTGET="bash4.2.45" PPA="agriffis/bashes" APTKEY="F5751EC8"
+    - env: SHELL="bash4.2.45" APTGET="bash4.2.45" PPA="agriffis/bashes"
       os:  linux
