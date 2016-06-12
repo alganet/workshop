@@ -148,10 +148,9 @@
 		STUBBED
 	}
 
-	set +e
 	set -- missingfail
 	workshop_server=myserver/
-	. ./workshop && _code=$? || _code=$?
+	( . ./workshop ) && _code=$? || _code=$?
 	test $_code = 127
 
 
@@ -166,9 +165,8 @@
 	}
 
 	set -- missingerror
-	set +e
 	workshop_server=myserver/
-	. ./workshop && _code=$? || _code=$?
+	( . ./workshop ) && _code=$? || _code=$?
 	test $_code = 127
 
 ---
