@@ -26,4 +26,4 @@ install:
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
 
 test_script:
-  - cmd: %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
+  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
