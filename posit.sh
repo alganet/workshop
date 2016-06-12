@@ -41,6 +41,8 @@ posit_run ()
 	    mkdir -m 700 "${_temp_dir}"
 	fi
 	cd "${_temp_dir}"
+	cp "${workshop_executable}" .
+	chmod +x "./workshop"
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
@@ -165,11 +167,6 @@ posit_bootstrap_command ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
-		workshop ()
-		{
-			unset -f workshop
-			. "\${workshop_executable}" "\${@:-}"
-		}
 		workshop_path="${workshop_path:-}"
 		workshop_dir="${workshop_dir:-}"
 		workshop_executable="${workshop_executable}"
