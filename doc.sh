@@ -1,6 +1,6 @@
 #!/usr/bin/env workshop
 
-require 'dispatch.sh' 'parsed.sh'
+require 'dispatch' 'parsed'
 
 doc ()
 {

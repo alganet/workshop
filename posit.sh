@@ -1,6 +1,6 @@
 #!/usr/bin/env workshop
 
-require 'dispatch.sh' 'doc.sh'
+require 'dispatch' 'doc'
 
 posit ()
 {
