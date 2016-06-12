@@ -21,9 +21,9 @@ environment:
       SHELLENV: C:\MinGW\msys\1.0\bin\sh
 
 install:
-  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
-  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
-  - cmd: %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
 
 test_script:
   - cmd: %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
