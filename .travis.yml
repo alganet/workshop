@@ -1,48 +1,45 @@
 sudo: required
 before_install:
-  - ${APTGET:+sudo apt-get -qq update}
-  - ${APTGET:+sudo apt-get install -y ${APTGET}}
-  - ${BREW:+brew update}
-  - ${BREW:+brew install  ${BREW}}
+  - eval "$DEPS"
 script:
-  - $SHELL workshop posit run .
+  - $SHELL workshop posit.sh run .
 matrix:
   include:
-    - env: SHELL="dash" APTGET=""
+    - env: SHELL="dash" DEPS=":"
       os:  linux
 
-    - env: SHELL="bash" APTGET=""
+    - env: SHELL="bash" DEPS=":"
       os:  linux
 
-    - env: SHELL="bash" APTGET=""
+    - env: SHELL="bash" DEPS=":"
       os:  osx
 
-    - env: SHELL="posh" APTGET="posh"
+    - env: SHELL="posh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y posh"
       os:  linux
 
-    - env: SHELL="mksh" APTGET="mksh"
+    - env: SHELL="mksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y mksh"
       os:  linux
 
-    - env: SHELL="zsh" APTGET="zsh"
+    - env: SHELL="zsh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y zsh"
       os:  linux
 
-    - env: SHELL="pdksh" APTGET="pdksh"
+    - env: SHELL="pdksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y pdksh"
       os:  linux
 
-    - env: SHELL="yash" APTGET="yash"
+    - env: SHELL="yash" DEPS="sudo apt-get -qq update ; sudo apt-get install -y yash"
       os:  linux
 
-    - env: SHELL="ksh" APTGET="ksh"
+    - env: SHELL="ksh" DEPS="sudo apt-get -qq update ; sudo apt-get install -y ksh"
       os:  linux
 
-    - env: SHELL="zsh-beta" APTGET="zsh-beta"
+    - env: SHELL="zsh-beta" DEPS="sudo apt-get -qq update ; sudo apt-get install -y zsh-beta"
       os:  linux
 
-    - env: SHELL="zsh" BREW="zsh"
+    - env: SHELL="zsh" DEPS="brew update ; brew install zsh"
       os:  osx
 
-    - env: SHELL="ksh" BREW="ksh"
+    - env: SHELL="ksh" DEPS="brew update ; brew install ksh"
       os:  osx
 
-    - env: SHELL="mksh" BREW="mksh"
+    - env: SHELL="mksh" DEPS="brew update ; brew install mksh"
       os:  osx

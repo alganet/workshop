@@ -1,37 +1,27 @@
 #!/usr/bin/env workshop
 
-require 'dispatch' 'doc'
+require 'dispatch.sh' 'doc.sh'
 
-# Runs tests inside Markdown code blocks
 posit ()
 {
 	dispatch 'posit' "${@:-}"
 }
 
-# Runs tests for a specified path
 posit_command_run ()
 {
-	find "${1:-${PWD}}" -type f | sort | grep ".md$" | posit_parse_multi
+	find "${1:-${PWD}}" -type f | sort | grep ".md$" | posit_code_elements
 }
 
-# Runs tests for each path provided in the stdin
-posit_parse_multi ()
+posit_code_elements ()
 {
 	while IFS='' read -r _file_path
 	do
-		posit_parse "${_file_path}"
+		doc_command_elements "${_file_path}" "code,h1,h2,h3,h4,h5,h6"
 		echo
-	done | posit_run
+	done | posit_parse
 }
 
-# Parses a Markdown file into an encoded doc stream of its elements
 posit_parse ()
-{
-	doc_command_elements "${1}" "code,h1,h2,h3,h4,h5,h6"
-}
-
-# Runs tests for any encoded doc stream of Markdown elements
-posit_run ()
 {
 	_errmode="$(set +o)"
 	_no=0
@@ -44,19 +34,45 @@ posit_run ()
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
-			# The name inside a link reference
 			'@name' )
 				_element_name="${_element_line#*	}"
 				;;
-			# The actual link reference
 			'@href' )
 				_element_href="${_element_line#*	}"
 				;;
-			# A heading
-			'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' )
+			'@title' )
+				_element_title="${_element_line#*	}"
+				;;
+			'@class' )
+				_element_class="${_element_line#*	}"
+				;;
+			'h6' )
 				_element_heading="${_element_line#*	}"
 				;;
-			# A Code element
+			'h5' )
+				echo "##### ${_element_line#*	}"
+				_element_heading="${_element_line#*	}"
+				;;
+			'h4' )
+				echo "#### ${_element_line#*	}"
+				_element_heading="${_element_line#*	}"
+				;;
+			'h3' )
+				echo "### ${_element_line#*	}"
+				_element_heading="${_element_line#*	}"
+				;;
+			'h2' )
+				echo ""
+				echo "## ${_element_line#*	}"
+				echo ""
+				_element_heading="${_element_line#*	}"
+				;;
+			'h1' )
+				echo ""
+				echo "# ${_element_line#*	}"
+				echo ""
+				_element_heading="${_element_line#*	}"
+				;;
 			'code' )
 				_raw_line="${_element_line#*	}"
 				_after_prompt="${_raw_line#*$ }"
@@ -79,13 +95,19 @@ posit_run ()
 						_e=$?
 						${_errmode}
 
-						posit_test_report \
-						"${_e}" "${_no}" "${_name:-}" "${_test_out}"
+						test ${_e} = 0 &&
+							echo "ok ${_no}		${_name:-}" ||
+							echo "not ok ${_no}	${_name:-}"
+
+						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+							echo "${_test_out:-}" | tail -n 100
 
 						_current_prompt=
 						_element=
 						_element_name=
 						_element_href=
+						_element_title=
+						_element_class=
 					fi
 					_on_prompt="${_after_prompt}"
 				else
@@ -107,11 +129,11 @@ posit_run ()
 			_name="${_on_prompt:-}"
 			_element="$(
 				printf %s "${_element}" |
-				sed 's/^[ \t]*//;s/[ \t]*$//'
+				sed 's/^[	 ]*//;s/[	 ]*$//'
 			)"
 			_on_prompt="$(
 				printf %s "${_on_prompt}" |
-				sed 's/^[ \t]*//;s/[ \t]*$//'
+				sed 's/^[	 ]*//;s/[	 ]*$//'
 			)"
 			_no=$(($_no + 1))
 
@@ -120,16 +142,22 @@ posit_run ()
 			_e=$?
 			${_errmode}
 
-			posit_test_report \
-			"${_e}" "${_no}" "${_name:-}" "${_test_out}"
+			test ${_e} = 0 &&
+				echo "ok ${_no}		${_name:-}" ||
+				echo "not ok ${_no}	${_name:-}"
+
+			test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+				echo "${_test_out:-}" | tail -n 100
 
 			_on_prompt=
 			_element=
 			_element_name=
 			_element_href=
+			_element_title=
+			_element_class=
 		fi
 
-		if test ! -z "${_element:-}" && test "${_element_name}" = '~'
+		if test ! -z "${_element:-}"
 		then
 			_name="${_element_heading:-}"
 			_namespace="${_element_href:-}"
@@ -139,6 +167,24 @@ posit_run ()
 				'file' )
 					printf %s\\n "${_element}" > "$(basename "${_value}")"
 					;;
+				'module' )
+					if test "${_value}" = 'test'
+					then
+						_no=$(($_no + 1))
+						_module="${_element_title}"
+						set +e
+						_test_out="$(posit_bootstrap_module)"
+						_e=$?
+						${_errmode}
+
+						test ${_e} = 0 &&
+							echo "ok ${_no}		${_name:-}" ||
+							echo "not ok ${_no}	${_name:-}"
+
+						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+							echo "${_test_out:-}" | tail -n 100
+						fi
+					;;
 				'test' )
 					_no=$(($_no + 1))
 
@@ -147,12 +193,19 @@ posit_run ()
 					_e=$?
 					${_errmode}
 
-					posit_test_report \
-					"${_e}" "${_no}" "${_name:-}" "${_test_out}"
+					test ${_e} = 0 &&
+						echo "ok ${_no}		${_name:-}" ||
+						echo "not ok ${_no}	${_name:-}"
+
+					test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+						echo "${_test_out:-}" | tail -n 100
+					;;
 			esac
 			_element=
 			_element_name=
 			_element_href=
+			_element_title=
+			_element_class=
 		fi
 	done
 	cd "${_current_dir}"
@@ -162,26 +215,13 @@ posit_run ()
 	exit $?
 }
 
-posit_test_report ()
-{
-	test ${1} = 0 &&
-		echo "ok ${2}		${3:-}" ||
-		echo "not ok ${2}	${3:-}"
-
-	test ${1} = 0 && _ok=$(($_ok + 1)) ||
-		echo "${4:-}" | tail -n 100
-}
-
-# Runs an external command list test
 posit_bootstrap_command ()
 {
-	${SHELL} <<-EXTERNALSHELL 2>&1
+	sh <<-EXTERNALSHELL 2>&1
 		set -x
 		workshop ()
 		{
-			set -- "\${@:-}"
-			unset -f workshop
-			. "\${path_to_workshop}"
+			. "\${path_to_workshop}" "\${@:-}"
 		}
 		workshop_path="${workshop_path:-}"
 		path_to_workshop="${workshop_executable}"
@@ -194,10 +234,35 @@ posit_bootstrap_command ()
 	EXTERNALSHELL
 }
 
-# Runs an external script test
+posit_bootstrap_module ()
+{
+	sh <<-EXTERNALMODULE 2>&1
+		path_to_workshop="${workshop_executable}"
+		workshop_executable="${workshop_executable}"
+		unsetopt NO_MATCH  >/dev/null 2>&1 || :
+		setopt SHWORDSPLIT >/dev/null 2>&1 || :
+
+		require ()
+		{
+			_deps="${_deps:-}${_deps:+}\${1}"
+		}
+
+		workshop_dependencies="${deps:-}"
+		workshop_modules=": workshop ${_module}"
+		unset deps
+		set -x
+
+		$(printf %s\\n "${_element}")
+
+		set -- "${_module:-}"
+		. "${workshop_executable}"
+	EXTERNALMODULE
+
+}
+
 posit_bootstrap_test ()
 {
-	${SHELL} <<-EXTERNALSHELL 2>&1
+	sh <<-EXTERNALSHELL 2>&1
 		set -x
 		path_to_workshop="${workshop_executable}"
 		workshop_executable="${workshop_executable}"

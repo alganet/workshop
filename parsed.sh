@@ -1,6 +1,5 @@
 #!/usr/bin/env workshop
 
-# Pre-processes DSL shell commands as a portable sed script
 parsed ()
 {
 	context ()
@@ -158,6 +157,7 @@ parsed ()
 
 	_parser="$(${1:-:};quit)"
 
+	#echo "${_parser}" 1>&2
 	sed -n "${_parser}"
 }
 

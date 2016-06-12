@@ -1,54 +1,28 @@
 #!/usr/bin/env sh
 
-# Initializes the workshop module loader
 workshop ()
 {
-	if test "${#}" -lt 2
-	then
-		return 0
-	fi
-
-	_executable="${workshop_executable:-${1}}"
+	test "${#}" -gt 1 || return 0
+	_executable="${1:-}"
 	_executable_dir="$(dirname "${workshop_executable:-$_executable}")"
-	_input="${2##*-}" # Remove trailing dashes
+	_input="${2##*-}"
+	_input="${_input##*-}"
 	_main="$(basename "${_input}")"
-	_main="${_main%%.*}" # Remove file extension
 	_master="https://raw.githubusercontent.com/alganet/workshop/master/"
 	_server="${workshop_server:-${_master}}"
 	shift 2
 
-	# Exit on errors, undefined variables and don't expand glob patterns
 	set -euf
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
-	# Split words like normal shell on zsh
 	setopt SHWORDSPLIT >/dev/null 2>&1 || :
 
 	_modules="${workshop_modules:- : workshop }"
 	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
 
-	# Path used to load modules
-	workshop_path=${workshop_path:-${PWD}:${_executable_dir}}
+	test ! -z "${_dependencies}" || return 0
 
-	# Uses an absolute path for the location of the workshop executable
-	if test -z "${workshop_executable:-}"
-	then
-		workshop_executable="$(
-			cd "${_executable_dir}";pwd
-		)/$(
-			basename "${_executable}"
-		)"
-	else
-		workshop_executable="$(
-			cd "$(dirname "${workshop_executable}")";pwd
-		)/$(
-			basename "${workshop_executable}"
-		)"
-	fi
-
-	# Run until something inside calls 'break'
 	while true 'Dependency Loop'
 	do
-		# Check if all required dependencies are already loaded
 		for _dependency in ${_dependencies}
 		do
 			_dependency_status='ok'
@@ -71,19 +45,17 @@ workshop ()
 				break 2 # Back to 'Dependency Loop'
 			fi
 
-			# Check if current dependency is already loaded
 			if test "${_modules#*$_dependency}" != "$_modules"
 			then
 				continue
 			fi
 
-			# Look for dependencies in ${workshop_path}
 			_found_module=''
 			_ifs="${IFS}"
 			IFS="${workshop_path_separator:-:}"
-			for _part in ${workshop_path}
+			for _part in ${workshop_path:-${PWD}:${_executable_dir}}
 			do
-				_file="$(echo "${_part}/${_dependency}").sh"
+				_file="$(echo "${_part}/${_dependency}")"
 
 				if test -f "${_file}"
 				then
@@ -94,18 +66,13 @@ workshop ()
 			IFS="${_ifs}"
 			unset _ifs
 
-			# Download a module if none was found in the path
 			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
-				_remote_url="${_server}${_dependency}.sh"
-				_found_module="${PWD}/${_dependency}.sh"
+				_remote_url="${_server}${_dependency}"
+				_found_module="${PWD}/${_dependency}"
 				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
-
-				# Tests whether you can check if commands exist
 				if command -v workshop >/dev/null 2>&1
 				then
-
-					# Try to download using popular CLI downloaders
 					if command -v curl >/dev/null 2>&1
 					then
 						curl --fail -L "${_remote_url}" \
@@ -117,14 +84,13 @@ workshop ()
 							2>/dev/null  > "${_found_module}" ||
 								_code=$?
 					else
-						return 6
+						return 127
 					fi
 
 					_head=
 					test ! -f "${_found_module}" ||
 						_head="$(head -n1 "${_found_module}")"
 
-					# Check if donwnloaded file is a workshop module
 					if test "${_head}" = "#!/usr/bin/env workshop" &&
 						test "${_code:-0}" = 0 &&
 						"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
@@ -133,25 +99,22 @@ workshop ()
 					else
 						test ! -f "${_found_module}" ||
 							rm "${_found_module}"
-						return 127
+						return 1
 					fi
 				else
-					return 6
+					return 127
 				fi
 			fi
 
 			_required=''
 
-			# Makes sure no one replaced the require function
 			require ()
 			{
 				_required="${_required:-} ${*:-} "
 			}
 
-			# Check dependency for errors
 			"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
 
-			# Load a dependency
 			. "${_found_module}"
 
 			_dependencies="${_required:-} ${_dependencies:-}"
@@ -159,9 +122,31 @@ workshop ()
 		done
 	done
 
-	# Run module wtih its arguments
-	"${_main}" "${@:-}"
+	set -- "${_main%%.*}" "${@:-}"
+
+	workshop_path=${workshop_path:-${PWD}:${_executable_dir}}
+
+	if test -z "${workshop_executable:-}"
+	then
+		workshop_executable="$(
+			cd "${_executable_dir}";pwd
+		)/$(
+			basename "${_executable}"
+		)"
+	else
+		workshop_executable="$(
+			cd "$(dirname "${workshop_executable}")";pwd
+		)/$(
+			basename "${workshop_executable}"
+		)"
+	fi
+
+	if test -z "${2:-}"
+	then
+		"${1:-}"
+	else
+		"${@:-}"
+	fi
 }
 
-# Only run workshop if there are two arguments at least
-test -z "${2:-}" || workshop "${0}" "${@:-}"
+test -z "${1:-}" || workshop "${0}" "${@:-}"

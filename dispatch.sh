@@ -1,6 +1,5 @@
 #!/usr/bin/env workshop
 
-# Dispatches options and arguments to namespaced functions
 dispatch ()
 {
 	_ns="${1}"
