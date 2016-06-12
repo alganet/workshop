@@ -145,7 +145,7 @@ workshop ()
 								_code=$?
 					else
 						# Module cannot be found
-						return 127
+						exit 127
 					fi
 
 					# Tests if downloaded file is a workshop module
@@ -162,10 +162,10 @@ workshop ()
 					then
 						# If not a valid module, delete it
 						rm "${_temp_module}"
-						return 127
+						exit 127
 					fi
 				else
-					return 127
+					exit 127
 				fi
 			fi
 
