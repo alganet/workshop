@@ -19,15 +19,11 @@ environment:
       SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: bash
       SHELLENV: C:\MinGW\msys\1.0\bin\sh
-    - SHELL: dash
-      SHELLENV: C:\MinGW\msys\1.0\bin\sh
-      MINGW: dash
 
 install:
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
-  - cmd: call %SHELLENV% -lc "${MINGW:+mingw-get install $MINGW}"
 
 test_script:
   - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
