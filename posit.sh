@@ -168,12 +168,15 @@ posit_bootstrap_command ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
-		PATH="\${PATH}:."
-		workshop_path="${workshop_path:-}"
-		workshop_executable="${workshop_executable}"
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
-		_output="\$(${_on_prompt})"
+		_output="\$(
+			set -x
+			PATH="\${PATH}:." \
+			workshop_path="${workshop_path:-}" \
+			workshop_executable="${workshop_executable}" \
+			${_on_prompt}
+		)"
 		test $? = 0 &&
 			test _"\${_output}" = _'${_element}'
 	EXTERNALSHELL
