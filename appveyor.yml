@@ -11,10 +11,10 @@ environment:
     - SHELL: ksh
 
 install:
-  - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
-  - cmd: bash -lc "pacman --noconfirm -Sy"
-  - cmd: bash -lc "pacman --noconfirm -S $SHELL"
+  - cmd: C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
+  - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
+  - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S $SHELL"
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cmd: bash -lc "$SHELL workshop posit run ."
+  - cmd: C:\msys64\usr\bin\bash -lc "$SHELL workshop posit run ."
