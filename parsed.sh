@@ -17,6 +17,8 @@ parsed ()
 		# Builds the parser, quits at the end
 		_parser="$(parsed_create;${1:-:};quit)"
 
+		mkdir -p "$(dirname "${_file}")"
+
 		# Saves it
 		printf %s "${_parser}" > "${_file}"
 
