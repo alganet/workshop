@@ -114,9 +114,15 @@ workshop ()
 			# If no module has been found, try to donwload it
 			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
+			    _temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null)"
+			    if test -z "${_temp_dir}"
+				then
+					_temp_dir="${TMPDIR:-/tmp}/workshop."$(od -An -N2 -i /dev/random)
+				    mkdir -m 700 "${_temp_dir}"
+				fi
 				_remote_url="${_server}${_dependency}.sh"
 				_found_module="${PWD}/${_dependency}.sh"
-				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
+				_temp_module="${_temp_dir}/${_dependency}.sh"
 
 				# Tests if current shell can check if commands exist
 				if command -v workshop >/dev/null 2>&1
@@ -125,12 +131,12 @@ workshop ()
 					if command -v curl >/dev/null 2>&1
 					then
 						curl --fail -L "${_remote_url}" \
-							2>/dev/null > "${_found_module}" ||
+							2>/dev/null > "${_temp_module}" ||
 								_code=$?
 					elif command -v wget >/dev/null 2>&1
 					then
 						wget -qO- "${_remote_url}" \
-							2>/dev/null  > "${_found_module}" ||
+							2>/dev/null  > "${_temp_module}" ||
 								_code=$?
 					else
 						# Module cannot be found
@@ -139,19 +145,18 @@ workshop ()
 
 					# Tests if downloaded file is a workshop module
 					_head=
-					test ! -f "${_found_module}" ||
-						_head="$(head -n1 "${_found_module}")"
+					test ! -f "${_temp_module}" ||
+						_head="$(head -n1 "${_temp_module}")"
 
 					if test "${_head}" = "#!/usr/bin/env workshop" &&
 						test "${_code:-0}" = 0 &&
-						"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
+						"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
 					then
-						# Do nothing if it is valid module
-						:
-					elif test -f "${_found_module}"
+						cp "${_temp_module}" "${_found_module}"
+					elif test -f "${_temp_module}"
 					then
 						# If not a valid module, delete it
-						rm "${_found_module}"
+						rm "${_temp_module}"
 						return 127
 					fi
 				else
@@ -179,6 +184,11 @@ workshop ()
 			_modules="${_modules} ${_dependency} "
 		done
 	done
+
+	if test ! -z "${_temp_dir:-}"
+	then
+		rm -Rf "${_temp_dir}"
+	fi
 
 	# Call module with arguments, if there is at least one
 	if test -z "${1:-}"
