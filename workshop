@@ -2,9 +2,13 @@
 
 workshop ()
 {
-	test "${#}" -gt 1 || return 0
-	_executable="${1:-}"
-	_executable_dir="$(dirname "${workshop_executable:-$_executable}")"
+	if test "${#}" -lt 2
+	then
+		return 0
+	fi
+
+	_executable="${workshop_executable:-${1}}"
+	_executable_dir="$(dirname "${_executable}")"
 	_input="${2##*-}"
 	_input="${_input##*-}"
 	_main="$(basename "${_input}")"
@@ -13,6 +17,13 @@ workshop ()
 	_server="${workshop_server:-${_master}}"
 	shift 2
 
+	workshop_path="${workshop_path:-${PWD}:${_executable_dir}}"
+	workshop_executable="$(
+		cd "${_executable_dir}";pwd
+	)/$(
+		basename "${_executable}"
+	)"
+
 	set -euf
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
 	setopt SHWORDSPLIT >/dev/null 2>&1 || :
@@ -20,7 +31,10 @@ workshop ()
 	_modules="${workshop_modules:- : workshop }"
 	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
 
-	test ! -z "${_dependencies}" || return 0
+	if test -z "${_dependencies}"
+	then
+		return 0
+	fi
 
 	while true 'Dependency Loop'
 	do
@@ -54,7 +68,7 @@ workshop ()
 			_found_module=''
 			_ifs="${IFS}"
 			IFS="${workshop_path_separator:-:}"
-			for _part in ${workshop_path:-${PWD}:${_executable_dir}}
+			for _part in ${workshop_path}
 			do
 				_file="$(echo "${_part}/${_dependency}").sh"
 
@@ -125,23 +139,6 @@ workshop ()
 
 	set -- "${_main}" "${@:-}"
 
-	workshop_path=${workshop_path:-${PWD}:${_executable_dir}}
-
-	if test -z "${workshop_executable:-}"
-	then
-		workshop_executable="$(
-			cd "${_executable_dir}";pwd
-		)/$(
-			basename "${_executable}"
-		)"
-	else
-		workshop_executable="$(
-			cd "$(dirname "${workshop_executable}")";pwd
-		)/$(
-			basename "${workshop_executable}"
-		)"
-	fi
-
 	if test -z "${2:-}"
 	then
 		"${1:-}"
@@ -150,4 +147,4 @@ workshop ()
 	fi
 }
 
-test -z "${1:-}" || workshop "${0}" "${@:-}"
+workshop "${0}" "${@:-}"
