@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+# workshop, the module loader
+#
+# Loads modules and their dependencies, downloading them from a server
+# if none is found locally.
+#
 workshop ()
 {
 	# Workshop needs at least two arguments to work
@@ -175,6 +180,7 @@ workshop ()
 		done
 	done
 
+	# Call module with arguments, if there is at least one
 	if test -z "${1:-}"
 	then
 		"${_main}"

@@ -2,26 +2,31 @@
 
 require 'dispatch' 'doc'
 
+# posit document test runner
+#
+# Extracts and runs shell script tests from Markdown code blocks.
+#
 posit ()
 {
 	dispatch 'posit' "${@:-}"
 }
 
+# Runs tests on all Markdown files found in the given path
 posit_command_run ()
 {
-	find "${1:-${PWD}}" -type f | sort | grep ".md$" | posit_code_elements
+	find "${1:-${PWD}}" -type f | sort | grep ".md$" | posit_run_multi
 }
 
-posit_code_elements ()
+posit_run_multi ()
 {
 	while IFS='' read -r _file_path
 	do
 		doc_command_elements "${_file_path}" "code,h1,h2,h3,h4,h5,h6"
 		echo
-	done | posit_parse
+	done | posit_run
 }
 
-posit_parse ()
+posit_run ()
 {
 	_errmode="$(set +o)"
 	_no=0
@@ -34,43 +39,10 @@ posit_parse ()
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
-			'@name' )
-				_element_name="${_element_line#*	}"
-				;;
 			'@href' )
 				_element_href="${_element_line#*	}"
 				;;
-			'@title' )
-				_element_title="${_element_line#*	}"
-				;;
-			'@class' )
-				_element_class="${_element_line#*	}"
-				;;
-			'h6' )
-				_element_heading="${_element_line#*	}"
-				;;
-			'h5' )
-				echo "##### ${_element_line#*	}"
-				_element_heading="${_element_line#*	}"
-				;;
-			'h4' )
-				echo "#### ${_element_line#*	}"
-				_element_heading="${_element_line#*	}"
-				;;
-			'h3' )
-				echo "### ${_element_line#*	}"
-				_element_heading="${_element_line#*	}"
-				;;
-			'h2' )
-				echo ""
-				echo "## ${_element_line#*	}"
-				echo ""
-				_element_heading="${_element_line#*	}"
-				;;
-			'h1' )
-				echo ""
-				echo "# ${_element_line#*	}"
-				echo ""
+			'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' )
 				_element_heading="${_element_line#*	}"
 				;;
 			'code' )
@@ -95,19 +67,11 @@ posit_parse ()
 						_e=$?
 						${_errmode}
 
-						test ${_e} = 0 &&
-							echo "ok ${_no}		${_name:-}" ||
-							echo "not ok ${_no}	${_name:-}"
-
-						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-							echo "${_test_out:-}" | tail -n 100
+						posit_report
 
 						_current_prompt=
 						_element=
-						_element_name=
 						_element_href=
-						_element_title=
-						_element_class=
 					fi
 					_on_prompt="${_after_prompt}"
 				else
@@ -142,19 +106,11 @@ posit_parse ()
 			_e=$?
 			${_errmode}
 
-			test ${_e} = 0 &&
-				echo "ok ${_no}		${_name:-}" ||
-				echo "not ok ${_no}	${_name:-}"
-
-			test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-				echo "${_test_out:-}" | tail -n 100
+			posit_report
 
 			_on_prompt=
 			_element=
-			_element_name=
 			_element_href=
-			_element_title=
-			_element_class=
 		fi
 
 		if test ! -z "${_element:-}"
@@ -167,24 +123,6 @@ posit_parse ()
 				'file' )
 					printf %s\\n "${_element}" > "$(basename "${_value}")"
 					;;
-				'module' )
-					if test "${_value}" = 'test'
-					then
-						_no=$(($_no + 1))
-						_module="${_element_title}"
-						set +e
-						_test_out="$(posit_bootstrap_module)"
-						_e=$?
-						${_errmode}
-
-						test ${_e} = 0 &&
-							echo "ok ${_no}		${_name:-}" ||
-							echo "not ok ${_no}	${_name:-}"
-
-						test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-							echo "${_test_out:-}" | tail -n 100
-						fi
-					;;
 				'test' )
 					_no=$(($_no + 1))
 
@@ -193,19 +131,11 @@ posit_parse ()
 					_e=$?
 					${_errmode}
 
-					test ${_e} = 0 &&
-						echo "ok ${_no}		${_name:-}" ||
-						echo "not ok ${_no}	${_name:-}"
-
-					test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-						echo "${_test_out:-}" | tail -n 100
+					posit_report
 					;;
 			esac
 			_element=
-			_element_name=
 			_element_href=
-			_element_title=
-			_element_class=
 		fi
 	done
 	cd "${_current_dir}"
@@ -213,6 +143,16 @@ posit_parse ()
 	echo "1..${_no}"
 	test "${_no}" = "${_ok}"
 	exit $?
+}
+
+posit_report ()
+{
+	test ${_e} = 0 &&
+		echo "ok ${_no}		${_name:-}" ||
+		echo "not ok ${_no}	${_name:-}"
+
+	test ${_e} = 0 && _ok=$(($_ok + 1)) ||
+		echo "${_test_out:-}"
 }
 
 posit_bootstrap_command ()
@@ -231,31 +171,6 @@ posit_bootstrap_command ()
 		test $? = 0 &&
 			test _"\${_output}" = _'${_element}'
 	EXTERNALSHELL
-}
-
-posit_bootstrap_module ()
-{
-	sh <<-EXTERNALMODULE 2>&1
-		workshop_executable="${workshop_executable}"
-		unsetopt NO_MATCH  >/dev/null 2>&1 || :
-		setopt SHWORDSPLIT >/dev/null 2>&1 || :
-
-		require ()
-		{
-			_deps="${_deps:-}${_deps:+}\${1}"
-		}
-
-		workshop_dependencies="${deps:-}"
-		workshop_modules=": workshop ${_module}"
-		unset deps
-		set -x
-
-		$(printf %s\\n "${_element}")
-
-		set -- "${_module:-}"
-		. "${workshop_executable}"
-	EXTERNALMODULE
-
 }
 
 posit_bootstrap_test ()
