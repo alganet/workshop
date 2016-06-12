@@ -167,6 +167,7 @@ posit_bootstrap_command ()
 		set -x
 		workshop ()
 		{
+			unset -f workshop
 			. "\${workshop_executable}" "\${@:-}"
 		}
 		workshop_path="${workshop_path:-}"
