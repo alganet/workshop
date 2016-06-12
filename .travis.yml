@@ -52,14 +52,14 @@ matrix:
     - env: SHELL="dash" BREW="dash"
       os:  osx
 
-    - env: SHELL="bash2.05b" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+    - env: SHELL="bash2.05b" APTGET="bash2.05b" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
       os:  linux
 
-    - env: SHELL="bash3.0.16" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+    - env: SHELL="bash3.0.16" APTGET="bash3.0.16" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
       os:  linux
 
-    - env: SHELL="bash3.2.48" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+    - env: SHELL="bash3.2.48" APTGET="bash3.2.48" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
       os:  linux
 
-    - env: SHELL="bash4.2.45" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+    - env: SHELL="bash4.2.45" APTGET="bash4.2.45" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
       os:  linux
