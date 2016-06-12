@@ -2,46 +2,68 @@
 
 workshop ()
 {
+	# Workshop needs at least two arguments to work
 	if test "${#}" -lt 2
 	then
 		return 0
 	fi
 
+	# Path to the executable that started workshop
 	_executable="${workshop_executable:-${1}}"
-	_executable_dir="$(dirname "${_executable}")"
-	_input="${2##*-}"
-	_input="${_input##*-}"
-	_main="$(basename "${_input}")"
-	_main="${_main%%.*}"
-	_master="https://raw.githubusercontent.com/alganet/workshop/master/"
-	_server="${workshop_server:-${_master}}"
-	shift 2
 
+	# Directory in which the workshop executable resides
+	_executable_dir="$(dirname "${_executable}")"
+
+	# Input module name or file path. Trim dashes from beginning.
+	_input="${2##*-}"
+
+	# Name of the module
+	_main="$(basename "${_input}")"
+
+	# Remove trailing file extension from main module
+	_main="${_main%%.*}"
+
+	# Default server to look for dependencies
+	_master="https://raw.githubusercontent.com/alganet/workshop/master/"
+
+	# Use default server if non has been provided
+	_server="${workshop_server:-${_master}}"
+
+	# List of modules already loaded
+	_modules="${workshop_modules:-} : workshop "
+
+	# List of modules to be loaded, include main module by default
+	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
+
+	# Path to look for other modules
 	workshop_path="${workshop_path:-${PWD}:${_executable_dir}}"
+
+	# Absolute path to the executable that started workshop
 	workshop_executable="$(
 		cd "${_executable_dir}";pwd
 	)/$(
 		basename "${_executable}"
 	)"
+	shift 2 # Remove first two arguments, remaining are module arguments
 
+	# Fail on errors and undefined variables. Don't expand glob patterns
 	set -euf
+
+	# Don't expand glob patterns on zsh
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
+
+	# Split words by whitespace when expanding variables on zsh
 	setopt SHWORDSPLIT >/dev/null 2>&1 || :
 
-	_modules="${workshop_modules:- : workshop }"
-	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
-
-	if test -z "${_dependencies}"
-	then
-		return 0
-	fi
-
+	# Don't stop until all dependencies are met
 	while true 'Dependency Loop'
 	do
+		# Check each dependency
 		for _dependency in ${_dependencies}
 		do
 			_dependency_status='ok'
 
+			# Check if all dependencies were already loaded first
 			for _dependency_check in ${_dependencies}
 			do
 				if test "${_modules#*$_dependency_check}" != "$_modules"
@@ -55,16 +77,19 @@ workshop ()
 				fi
 			done
 
+			# All dependencies loaded, get out
 			if test "${_dependency_status}" = 'ok'
 			then
-				break 2 # Back to 'Dependency Loop'
+				break 2 # Exit 'Dependency Loop'
 			fi
 
+			# Current dependency is already loaded, continue to next one
 			if test "${_modules#*$_dependency}" != "$_modules"
 			then
 				continue
 			fi
 
+			# Looks for modules in the ${workshop_path}
 			_found_module=''
 			_ifs="${IFS}"
 			IFS="${workshop_path_separator:-:}"
@@ -75,19 +100,23 @@ workshop ()
 				if test -f "${_file}"
 				then
 					_found_module="${_file}"
-					break # Back to for _part
+					break # Module found, exit loop
 				fi
 			done
 			IFS="${_ifs}"
 			unset _ifs
 
+			# If no module has been found, try to donwload it
 			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
 				_remote_url="${_server}${_dependency}.sh"
 				_found_module="${PWD}/${_dependency}.sh"
 				mkdir -p "$(dirname "${_found_module}")" 2>&1 >/dev/null
+
+				# Tests if current shell can check if commands exist
 				if command -v workshop >/dev/null 2>&1
 				then
+					# Check for popular HTTP download tools
 					if command -v curl >/dev/null 2>&1
 					then
 						curl --fail -L "${_remote_url}" \
@@ -99,9 +128,11 @@ workshop ()
 							2>/dev/null  > "${_found_module}" ||
 								_code=$?
 					else
+						# Module cannot be found
 						return 127
 					fi
 
+					# Tests if downloaded file is a workshop module
 					_head=
 					test ! -f "${_found_module}" ||
 						_head="$(head -n1 "${_found_module}")"
@@ -110,11 +141,13 @@ workshop ()
 						test "${_code:-0}" = 0 &&
 						"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
 					then
+						# Do nothing if it is valid module
 						:
-					else
-						test ! -f "${_found_module}" ||
-							rm "${_found_module}"
-						return 1
+					elif test -f "${_found_module}"
+					then
+						# If not a valid module, delete it
+						rm "${_found_module}"
+						return 127
 					fi
 				else
 					return 127
@@ -123,27 +156,30 @@ workshop ()
 
 			_required=''
 
+			# Makes sure no one overrided the require function
 			require ()
 			{
 				_required="${_required:-} ${*:-} "
 			}
 
+			# Dry-runs the module to check for errors
 			"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
 
+			# Loads the module, calling its 'require' commands
 			. "${_found_module}"
 
+			# Add up newly found dependencies to list
 			_dependencies="${_required:-} ${_dependencies:-}"
+			# Add loaded module to list of dependencies met
 			_modules="${_modules} ${_dependency} "
 		done
 	done
 
-	set -- "${_main}" "${@:-}"
-
-	if test -z "${2:-}"
+	if test -z "${1:-}"
 	then
-		"${1:-}"
+		"${_main}"
 	else
-		"${@:-}"
+		"${_main}" "${@}"
 	fi
 }
 
