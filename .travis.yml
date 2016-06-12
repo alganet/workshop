@@ -1,5 +1,7 @@
 sudo: required
 before_install:
+  - ${APTKEY:+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "$APTKEY"}
+  - ${PPA:+echo "deb ${PPA} main" | sudo tee -a "/etc/apt/sources.list"}
   - ${APTGET:+sudo apt-get -qq update}
   - ${APTGET:+sudo apt-get install -y ${APTGET}}
   - ${BREW:+brew update}
@@ -46,3 +48,18 @@ matrix:
 
     - env: SHELL="mksh" BREW="mksh"
       os:  osx
+
+    - env: SHELL="dash" BREW="dash"
+      os:  osx
+
+    - env: SHELL="bash2.05b" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+      os:  linux
+
+    - env: SHELL="bash3.0.16" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+      os:  linux
+
+    - env: SHELL="bash3.2.48" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+      os:  linux
+
+    - env: SHELL="bash4.2.45" PPA="agriffis/bashes precise" APTKEY="F5751EC8"
+      os:  linux
