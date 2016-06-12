@@ -1,5 +1,6 @@
 #!/usr/bin/env workshop
 
+# dispatches command line arguments and options to functions
 dispatch ()
 {
 	_ns="${1}"

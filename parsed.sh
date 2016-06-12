@@ -1,58 +1,49 @@
 #!/usr/bin/env workshop
 
+# parsed, the sed DSL
+#
+# Executes a function with parsed DSL language and outputs a sed script
+# compatible with most sed versions.
+#
 parsed ()
 {
-	context ()
-	{
-		printf %s\\n ":_${1}"
-	}
+	# Logs the buffer (for testing purpouses)
+	debug ()   ( printf %s\\n '	l' )
+	# Defines a sed label
+	context () ( printf %s\\n ":_${1}" )
+	# Deletes the current line
+	delete ()  ( printf %s\\n '	d' )
+	# Jumps to a sed label (enters a context)
+	enter ()   ( printf %s\\n "	b _${1}" )
+	# Gets the pattern from the hold buffer
+	get ()     ( printf %s\\n '	g' )
+	# Holds the buffer
+	hold ()    ( printf %s\\n '	h' )
+	# Appends to the hold buffer
+	keep ()    ( printf %s\\n '	H' )
+	# Marks the output element
+	mark ()    ( printf %s\\n "	s/^/${1}	/" )
+	# Moves to the next line
+	next ()    ( printf %s\\n '	n' )
+	# Prints the current line
+	print ()   ( printf %s\\n '	p' )
+	# Quits parsing
+	quit ()    ( printf %s\\n '	q' )
+	# Removes a pattern from the start of the line
+	remove ()  ( replace "^${1}" '' )
+	# Replaces a pattern
+	replace () ( printf %s\\n "	s/${1}/${2:-}/" )
+	# Swaps the buffer with the hold buffer
+	swap ()    ( printf %s\\n '	x' )
 
-	print ()
-	{
-		printf %s\\n '	p'
-	}
-
-	mark ()
-	{
-		printf %s\\n "	s/^/${1}	/"
-	}
-
-	delete ()
-	{
-		printf %s\\n '	d'
-	}
-
-	next ()
-	{
-		printf %s\\n '	n'
-	}
-
-	quit ()
-	{
-		printf %s\\n '	q'
-	}
-
-	debug ()
-	{
-		printf %s\\n '	l'
-	}
-
+	# Marks an element and appends a line
 	line ()
 	{
 		mark "${1}"
 		move
 	}
 
-	remove ()
-	{
-		replace "^${1}" ''
-	}
-
-	replace ()
-	{
-		printf %s\\n "	s/${1}/${2:-}/"
-	}
-
+	# Marks a subpattern as element, appends a line
 	grind ()
 	{
 		replace "^${2}" ''
@@ -60,6 +51,7 @@ parsed ()
 		move
 	}
 
+	# Prepend text to the line
 	prepend ()
 	{
 		cat <<-SEDN
@@ -69,6 +61,7 @@ parsed ()
 		SEDN
 	}
 
+	# Append text to the line
 	append ()
 	{
 		cat <<-SEDN
@@ -78,21 +71,7 @@ parsed ()
 		SEDN
 	}
 
-	hold ()
-	{
-		printf %s\\n '	h'
-	}
-
-	keep ()
-	{
-		printf %s\\n '	H'
-	}
-
-	get ()
-	{
-		printf %s\\n '	g'
-	}
-
+	# Removes a subpattern as an element, puts rest in the buffer
 	detach ()
 	{
 		hold
@@ -103,12 +82,14 @@ parsed ()
 		replace "^${2}" ''
 	}
 
+	# Prints a line and gets a new one
 	move ()
 	{
 		print
 		next
 	}
 
+	# Performs action if end of script
 	ifend ()
 	{
 		printf %s\\n "$	{"
@@ -117,6 +98,7 @@ parsed ()
 		echo
 	}
 
+	# Performs action if pattern is matched
 	ifmatch ()
 	{
 		printf %s\\n "/^${1}/	{"
@@ -125,6 +107,7 @@ parsed ()
 		echo
 	}
 
+	# Perform action if pattern is not matched
 	ifnotmatchall ()
 	{
 		printf %s\\n "/${1}/!	{"
@@ -133,16 +116,7 @@ parsed ()
 		printf %s\\n
 	}
 
-	swap ()
-	{
-		printf %s\\n '	x'
-	}
-
-	enter ()
-	{
-		printf %s\\n "	b _${1}"
-	}
-
+	# Replace all occurrences of something
 	replaceall ()
 	{
 		cat <<-SEDN
@@ -155,9 +129,10 @@ parsed ()
 		SEDN
 	}
 
+	# Builds the parser, quits at the end
 	_parser="$(${1:-:};quit)"
 
-	#echo "${_parser}" 1>&2
+	# Outputs it
 	sed -n "${_parser}"
 }
 
