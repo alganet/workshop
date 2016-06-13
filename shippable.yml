@@ -1,7 +1,6 @@
 language: none
 env:
   - SHELL="dash"
-  - APTGET=""
 matrix:
   include:
     - env:
