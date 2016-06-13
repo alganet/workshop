@@ -2,42 +2,42 @@ language: none
 matrix:
   include:
     - env:
-      - TARGET="dash"
+      - SHELL="dash"
       - APTGET=""
 
     - env:
-      - TARGET="bash"
+      - SHELL="bash"
       - APTGET=""
 
     - env:
-      - TARGET="posh"
+      - SHELL="posh"
       - APTGET="posh"
 
     - env:
-      - TARGET="mksh"
+      - SHELL="mksh"
       - APTGET="mksh"
 
     - env:
-      - TARGET="zsh"
+      - SHELL="zsh"
       - APTGET="zsh"
 
     - env:
-      - TARGET="pdksh"
+      - SHELL="pdksh"
       - APTGET="pdksh"
 
     - env:
-      - TARGET="yash"
+      - SHELL="yash"
       - APTGET="yash"
 
     - env:
-      - TARGET="ksh"
+      - SHELL="ksh"
       - APTGET="ksh"
 
     - env:
-      - TARGET="zsh-beta" APTGET="zsh-beta"
+      - SHELL="zsh-beta" APTGET="zsh-beta"
 
     - env:
-      - TARGET="busybox sh" APTGET="busybox"
+      - SHELL="busybox sh" APTGET="busybox"
 
 build:
   ci:
