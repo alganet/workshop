@@ -17,6 +17,9 @@ environment:
     - SHELL: ksh
       PACMAN: ksh
       SHELLENV: C:\msys64\usr\bin\bash
+    - SHELL: busybox sh
+      PACMAN: busybox
+      SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: bash
       SHELLENV: C:\MinGW\msys\1.0\bin\sh
 

@@ -39,6 +39,9 @@ matrix:
     - env: SHELL="zsh-beta" APTGET="zsh-beta"
       os:  linux
 
+    - env: SHELL="busybox sh" APTGET="busybox"
+      os:  linux
+
     - env: SHELL="zsh" BREW="zsh"
       os:  osx
 
