@@ -70,7 +70,7 @@ posit_run ()
 						_no=$(($_no + 1))
 
 						set +e
-						_test_out="$(posit_bootstrap_command)"
+						_test_out="$(: | posit_bootstrap_command)"
 						_e=$?
 						${_errmode}
 
@@ -109,7 +109,7 @@ posit_run ()
 			_no=$(($_no + 1))
 
 			set +e
-			_test_out="$(posit_bootstrap_command)"
+			_test_out="$(: | posit_bootstrap_command)"
 			_e=$?
 			${_errmode}
 
@@ -135,7 +135,7 @@ posit_run ()
 					_no=$(($_no + 1))
 
 					set +e
-					_test_out="$(posit_bootstrap_test)"
+					_test_out="$(: | posit_bootstrap_test)"
 					_e=$?
 					${_errmode}
 
@@ -168,11 +168,10 @@ posit_bootstrap_command ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
+		set +e
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		_output="\$(
-			set -x
-			set +e
 			PATH="\${PATH}:." \
 			workshop_path="${workshop_path:-}" \
 			workshop_unsafe=1 \
@@ -181,6 +180,8 @@ posit_bootstrap_command ()
 		)"
 		test $? = 0 &&
 			test _"\${_output}" = _'${_element}'
+
+		exit $?
 	EXTERNALSHELL
 }
 
@@ -196,6 +197,8 @@ posit_bootstrap_test ()
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		$(printf %s\\n "${_element}")
+
+		exit $?
 	EXTERNALSHELL
 
 }
