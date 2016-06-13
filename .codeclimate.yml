@@ -1,0 +1,11 @@
+engines:
+  shellcheck:
+    enabled: true
+  markdownlint:
+    enabled: true
+
+ratings:
+  paths:
+  - "doc/**.md"
+  - "**.sh"
+  - "workshop"
