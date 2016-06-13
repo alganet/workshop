@@ -75,7 +75,7 @@ doc_filter ()
 			# Line is empty, element ended
 			'' )
 				test -z "${_element:-}" || echo "${_line}"
-				_element= # Outside an element
+				_element=
 				;;
 		esac
 	done

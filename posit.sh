@@ -150,12 +150,19 @@ posit_run ()
 
 posit_report ()
 {
-	test ${_e} = 0 &&
-		echo "ok ${_no}		${_name:-}" ||
+	if test ${_e} = 0
+	then
+		echo "ok ${_no}		${_name:-}"
+	else
 		echo "not ok ${_no}	${_name:-}"
+	fi
 
-	test ${_e} = 0 && _ok=$((_ok + 1)) ||
+	if test ${_e} = 0
+	then
+		_ok=$((_ok + 1))
+	else
 		echo "${_test_out:-}" | sed 's/^/#	/'
+	fi
 }
 
 posit_bootstrap_command ()

@@ -52,7 +52,6 @@
 		modulethree
 	}
 
-
 [~]:file:moduletwo.sh
 	#!/usr/bin/env workshop
 
@@ -271,7 +270,6 @@ Hello World
 	><
 	>text	Hello World<
 	>text	<
-
 
 ## Code Blocks
 

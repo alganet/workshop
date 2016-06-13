@@ -6,7 +6,7 @@ dispatch ()
 	_ns="${1}"
 	_arg="${2:-}"
 
-	if test '_' = '_'${_arg}
+	if test "" = "${_arg}"
 	then
 		return 0
 	fi
