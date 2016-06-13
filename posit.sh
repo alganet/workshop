@@ -172,6 +172,7 @@ posit_bootstrap_command ()
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		_output="\$(
 			set -x
+			set +e
 			PATH="\${PATH}:." \
 			workshop_path="${workshop_path:-}" \
 			workshop_unsafe=1 \
@@ -187,6 +188,7 @@ posit_bootstrap_test ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
 		set -x
+		set +e
 		PATH="\${PATH}:."
 		workshop_unsafe=1
 		workshop_path="${workshop_path:-}"
