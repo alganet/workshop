@@ -43,4 +43,4 @@ build:
   ci:
     - ${APTGET:+sudo apt-get update}
     - ${APTGET:+sudo apt-get install -y ${APTGET}}
-    - ${SHELL:-sh} workshop posit run .
+    - SHELL=${SHELL}; workshop posit run .
