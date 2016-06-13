@@ -1,4 +1,13 @@
 language: none
+build:
+  ci:
+    # Update apt catalogue if going to install anything
+    - ${APTGET:+sudo apt-get update}
+
+    # Install apt-get dependencies
+    - ${APTGET:+sudo apt-get install -y ${APTGET}}
+    - SHELL=${SHELL:-sh}; ${SHELL} lib/workshop posit run .
+
 env:
   - SHELL="dash"
 matrix:
@@ -36,9 +45,3 @@ matrix:
 
     - env:
       - SHELL="busybox sh" APTGET="busybox"
-
-build:
-  ci:
-    - ${APTGET:+sudo apt-get update}
-    - ${APTGET:+sudo apt-get install -y ${APTGET}}
-    - SHELL=${SHELL:-sh}; ${SHELL} workshop posit run .

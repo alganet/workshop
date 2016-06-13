@@ -3,6 +3,17 @@ os: Windows Server 2012 R2
 build: off
 deploy: off
 
+install:
+  # Update pacman if going to install anything
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
+
+  # Install pacman dependencies
+  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
+
+test_script:
+  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL lib/workshop posit run ."
+
 environment:
   matrix:
     - SHELL: bash
@@ -22,11 +33,3 @@ environment:
       SHELLENV: C:\msys64\usr\bin\bash
     - SHELL: bash
       SHELLENV: C:\MinGW\msys\1.0\bin\sh
-
-install:
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
-
-test_script:
-  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL workshop posit run ."
