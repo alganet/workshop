@@ -40,15 +40,16 @@ workshop ()
 	# List of modules to be loaded, include main module by default
 	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
 
-	# Path to look for other modules
-	workshop_path="${workshop_path:-${PWD}:${_executable_dir}}"
-
 	# Absolute path to the executable that started workshop
 	workshop_executable="$(
 		cd "${_executable_dir}" || exit;pwd
 	)/$(
 		basename "${_executable}"
 	)"
+
+	# Path to look for other modules
+	workshop_path="${workshop_path:-${PWD}:$(dirname ${workshop_executable})}"
+
 	shift 2 # Remove first two arguments, remaining are module arguments
 
 	# Fail on errors and undefined variables. Don't expand glob patterns
