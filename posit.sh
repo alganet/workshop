@@ -67,7 +67,7 @@ posit_run ()
 					if test ! -z "${_on_prompt:-}"
 					then
 						_name="${_current_prompt:-}"
-						_no=(($_no + 1))
+						_no=$((_no + 1))
 
 						set +e
 						_test_out="$(: | posit_bootstrap_command)"
@@ -100,7 +100,7 @@ posit_run ()
 			_name="${_on_prompt:-}"
 			_element="$(printf %s "${_element}")"
 			_on_prompt="$(printf %s "${_on_prompt}")"
-			_no=(($_no + 1))
+			_no=$((_no + 1))
 
 			set +e
 			_test_out="$(: | posit_bootstrap_command)"
@@ -126,7 +126,7 @@ posit_run ()
 					printf %s\\n "${_element}" > "${_file}"
 					;;
 				'test' )
-					_no=(($_no + 1))
+					_no=$((_no + 1))
 
 					set +e
 					_test_out="$(: | posit_bootstrap_test)"
@@ -154,7 +154,7 @@ posit_report ()
 		echo "ok ${_no}		${_name:-}" ||
 		echo "not ok ${_no}	${_name:-}"
 
-	test ${_e} = 0 && _ok=(($_ok + 1)) ||
+	test ${_e} = 0 && _ok=$((_ok + 1)) ||
 		echo "${_test_out:-}" | sed 's/^/#	/'
 }
 
