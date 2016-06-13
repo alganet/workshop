@@ -1,28 +1,28 @@
 language: none
 matrix:
   include:
-    - env: SHELL="dash" APTGET=""
+    - env: TARGET="dash" APTGET=""
 
-    - env: SHELL="bash" APTGET=""
+    - env: TARGET="bash" APTGET=""
 
-    - env: SHELL="posh" APTGET="posh"
+    - env: TARGET="posh" APTGET="posh"
 
-    - env: SHELL="mksh" APTGET="mksh"
+    - env: TARGET="mksh" APTGET="mksh"
 
-    - env: SHELL="zsh" APTGET="zsh"
+    - env: TARGET="zsh" APTGET="zsh"
 
-    - env: SHELL="pdksh" APTGET="pdksh"
+    - env: TARGET="pdksh" APTGET="pdksh"
 
-    - env: SHELL="yash" APTGET="yash"
+    - env: TARGET="yash" APTGET="yash"
 
-    - env: SHELL="ksh" APTGET="ksh"
+    - env: TARGET="ksh" APTGET="ksh"
 
-    - env: SHELL="zsh-beta" APTGET="zsh-beta"
+    - env: TARGET="zsh-beta" APTGET="zsh-beta"
 
-    - env: SHELL="busybox sh" APTGET="busybox"
+    - env: TARGET="busybox sh" APTGET="busybox"
 
 build:
   ci:
     - ${APTGET:+sudo apt-get update}
     - ${APTGET:+sudo apt-get install -y ${APTGET}}
-    - ${SHELL} workshop posit run .
+    - SHELL=${TARGET}; ${TARGET} workshop posit run .

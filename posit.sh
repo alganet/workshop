@@ -173,10 +173,8 @@ posit_bootstrap_command ()
 			${_on_prompt}
 		)"
 		_code=\$?
-		printf %s "\${_output}" > /tmp/1.md
-		printf %s "${_element}" > /tmp/2.md
 		test \${_code} = 0 &&
-			test _"\${_output}" = _"${_element}"
+			test _"\${_output}" = _'${_element}'
 	EXTERNALSHELL
 }
 

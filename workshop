@@ -179,7 +179,7 @@ workshop ()
 			}
 
 			# Dry-runs the module to check for errors
-			"${SHELL}" -n "${_found_module}" >/dev/null 2>&1
+			${SHELL} -n "${_found_module}" >/dev/null 2>&1
 
 			# Loads the module, calling its 'require' commands
 			. "${_found_module}"
