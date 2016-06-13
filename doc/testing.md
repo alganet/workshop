@@ -78,9 +78,7 @@
 	Hello
 	Ola
 	Oi
-
 ---
-
 
 ## Downloading Dependencies
 
@@ -103,7 +101,6 @@
 	workshop_server=myserver/
 	test 'Hello --fail -L myserver/missingdep.sh' = "$(. ./workshop)"
 
-
 ## Module Dependencies Download
 
 [~]:file:somedependency.sh
@@ -115,7 +112,6 @@
 	{
 		moduledep
 	}
-
 
 [~]:test
 
@@ -152,7 +148,6 @@
 	workshop_server=myserver/
 	( . ./workshop ) && _status=$? || _status=$?
 	test $_status = 127
-
 
 ## Failure on curl error
 
@@ -207,7 +202,6 @@
 	ok 1		Creating Functions
 	1..1
 
-
 ## Using Test Fixtures
 
 [~]:file:cat_display.md
@@ -234,6 +228,7 @@
 ## Markdown parsing
 
 [~]:file:md_parse_hello.md
+
 ```
 Hello World
 ```
@@ -262,6 +257,7 @@ Hello World
 ## Headings
 
 [~]:file:md_parse_hello.md
+
 ```
 # Greetings
 
@@ -280,6 +276,7 @@ Hello World
 ## Code Blocks
 
 [~]:file:md_parse_hello.md
+
 ```
 # Greetings
 

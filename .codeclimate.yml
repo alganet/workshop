@@ -2,11 +2,16 @@ engines:
   shellcheck:
     enabled: true
     checks:
+      # Unspecified shebang
       SC1008:
+        enabled: false
+      # Non posix var replace
+      SC2001:
         enabled: false
   markdownlint:
     enabled: true
     checks:
+      # Hard tabs
       MD010:
         enabled: false
 

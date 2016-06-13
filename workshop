@@ -45,7 +45,7 @@ workshop ()
 
 	# Absolute path to the executable that started workshop
 	workshop_executable="$(
-		cd "${_executable_dir}";pwd
+		cd "${_executable_dir}" || exit;pwd
 	)/$(
 		basename "${_executable}"
 	)"
@@ -101,7 +101,7 @@ workshop ()
 			IFS="${workshop_path_separator:-:}"
 			for _part in ${workshop_path}
 			do
-				_file="$(echo "${_part}/${_dependency}").sh"
+				_file="${_part}/${_dependency}.sh"
 
 				if test -f "${_file}"
 				then
