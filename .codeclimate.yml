@@ -1,6 +1,14 @@
 engines:
   shellcheck:
     enabled: true
+    # False positives
+    exclude_fingerprints:
+    # _ticked='```' is a string, not a failed expression
+    - 3e590dca5d1b3db57ad3fe2cb63d033d
+    # Dynamic module loading cannot be followed by ShellSheck, no error
+    - 4605231c31998048d33bdf3387f68a55
+    # workshop_executable is a global, not undefined
+    - 23afb98d5685eb6806fce247271b425a
     checks:
       # Unspecified shebang
       SC1008:
@@ -10,6 +18,10 @@ engines:
         enabled: false
   markdownlint:
     enabled: true
+    # False positives
+    exclude_fingerprints:
+    # GitHub badges are allowed to be in a long line
+    - 0b5b680cd245793478713bb59bd40aef
     checks:
       # Hard tabs
       MD010:
