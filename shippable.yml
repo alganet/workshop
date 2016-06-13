@@ -1,10 +1,9 @@
 language: none
+env:
+  - SHELL="dash"
+  - APTGET=""
 matrix:
   include:
-    - env:
-      - SHELL="dash"
-      - APTGET=""
-
     - env:
       - SHELL="bash"
       - APTGET=""
