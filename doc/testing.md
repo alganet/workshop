@@ -151,7 +151,7 @@
 	set -- missingfail
 	workshop_server=myserver/
 	( . ./workshop ) && _status=$? || _status=$?
-	test $_status != 0
+	test $_status = 127
 
 
 ## Failure on curl error
@@ -167,7 +167,7 @@
 	set -- missingerror
 	workshop_server=myserver/
 	( . ./workshop ) && _status=$? || _status=$?
-	test $_status != 0
+	test $_status = 127
 
 ---
 
