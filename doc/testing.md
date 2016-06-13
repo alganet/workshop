@@ -230,3 +230,66 @@
 	$ workshop posit run cat_display.md
 	ok 1		cat hello.txt
 	1..1
+
+## Markdown parsing
+
+[~]:file:md_parse_hello.md
+```
+Hello World
+```
+
+---
+
+	$ workshop doc elements md_parse_hello.md | sed 's/^.*/>&</'
+	>text	Hello World<
+	>text	<
+
+## Line preserving on indented blocks
+
+[~]:file:md_parse_hello.md
+
+	Hello
+
+	World
+---
+
+	$ workshop doc elements md_parse_hello.md | sed 's/^.*/>&</'
+	>text	Hello<
+	>text	<
+	>text	World<
+	>text	<
+
+## Headings
+
+[~]:file:md_parse_hello.md
+```
+# Greetings
+
+Hello World
+```
+
+---
+
+	$ workshop doc elements md_parse_hello.md | sed 's/^.*/>&</'
+	>h1	Greetings<
+	><
+	>text	Hello World<
+	>text	<
+
+
+## Code Blocks
+
+[~]:file:md_parse_hello.md
+```
+# Greetings
+
+Hello World
+```
+
+---
+
+	$ workshop doc elements md_parse_hello.md | sed 's/^.*/>&</'
+	>h1	Greetings<
+	><
+	>text	Hello World<
+	>text	<

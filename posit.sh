@@ -98,14 +98,8 @@ posit_run ()
 		if test ! -z "${_on_prompt:-}"
 		then
 			_name="${_on_prompt:-}"
-			_element="$(
-				printf %s "${_element}" |
-				sed 's/^[	 ]*//;s/[	 ]*$//'
-			)"
-			_on_prompt="$(
-				printf %s "${_on_prompt}" |
-				sed 's/^[	 ]*//;s/[	 ]*$//'
-			)"
+			_element="$(printf %s "${_element}")"
+			_on_prompt="$(printf %s "${_on_prompt}")"
 			_no=$(($_no + 1))
 
 			set +e
@@ -161,7 +155,7 @@ posit_report ()
 		echo "not ok ${_no}	${_name:-}"
 
 	test ${_e} = 0 && _ok=$(($_ok + 1)) ||
-		echo "${_test_out:-}"
+		echo "${_test_out:-}" | sed 's/^/#	/'
 }
 
 posit_bootstrap_command ()
@@ -178,10 +172,11 @@ posit_bootstrap_command ()
 			workshop_executable="${workshop_executable}" \
 			${_on_prompt}
 		)"
-		test $? = 0 &&
-			test _"\${_output}" = _'${_element}'
-
-		exit $?
+		_code=\$?
+		printf %s "\${_output}" > /tmp/1.md
+		printf %s "${_element}" > /tmp/2.md
+		test \${_code} = 0 &&
+			test _"\${_output}" = _"${_element}"
 	EXTERNALSHELL
 }
 
