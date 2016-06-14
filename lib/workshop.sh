@@ -209,6 +209,13 @@ workshop ()
 			if test "${_dependency}" != "workshop"
 			then
 				. "${_found_module}"
+			else
+				# Redefine some variables after getting a disk instance
+				# of workshop
+				_executable="${_found_module}"
+				_executable_dir="$(dirname "${_executable}")"
+				_executable_dir="$(cd "${_executable_dir}" || exit;pwd)"
+				workshop_executable="${_executable_dir}/$(basename "${_executable}")"
 			fi
 
 			# Add up newly found dependencies to list

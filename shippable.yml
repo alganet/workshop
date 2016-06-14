@@ -6,7 +6,7 @@ build:
 
     # Install apt-get dependencies
     - ${APTGET:+sudo apt-get install -y ${APTGET}}
-    - SHELL=${SHELL:-sh}; ${SHELL} lib/workshop posit run .
+    - SHELL=${SHELL:-sh}; ${SHELL} lib/workshop.sh posit run .
 
 env:
   - SHELL="dash"

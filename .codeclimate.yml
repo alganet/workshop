@@ -29,6 +29,5 @@ engines:
 
 ratings:
   paths:
-  - "doc/**.md"
+  - "**.md"
   - "**.sh"
-  - "workshop"
