@@ -215,7 +215,9 @@ workshop ()
 				_executable="${_found_module}"
 				_executable_dir="$(dirname "${_executable}")"
 				_executable_dir="$(cd "${_executable_dir}" || exit;pwd)"
-				workshop_executable="${_executable_dir}/$(basename "${_executable}")"
+				workshop_executable="${_executable_dir}/$(
+					basename "${_executable}"
+				)"
 			fi
 
 			# Add up newly found dependencies to list
@@ -224,6 +226,11 @@ workshop ()
 			_modules="${_modules} ${_dependency} "
 		done
 	done
+
+	if test ! -z "${_temp_dir}"
+	then
+		rm -Rf "${_temp_dir}"
+	fi
 
 	# Call module with arguments, if there is at least one
 	if test -z "${*:-}"
