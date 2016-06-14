@@ -16,7 +16,7 @@ before_install:
   - ${BREW:+brew install ${BREW}}
 
 script:
-  - $SHELL lib/workshop.sh posit run .
+  - $SHELL lib/workshop.sh posit run doc
 matrix:
   include:
     - env: SHELL="dash" APTGET=""
