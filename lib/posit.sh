@@ -17,6 +17,16 @@ posit_command_run ()
 	find "${1:-$(pwd)}" -type f | sort | grep ".md$" | posit_run_multi
 }
 
+posit_option_help ()
+{
+	cat <<-USAGE
+	Usage: posit [COMMAND]
+	Extracts and runs shell script tests from Markdown code blocks.
+
+	Commands: run  PATH  Runs all files specified in the given path
+	USAGE
+}
+
 posit_run_multi ()
 {
 	while IFS='' read -r _file_path

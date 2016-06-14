@@ -13,9 +13,12 @@ workshop ()
 		return 0
 	fi
 
-	# Fail on errors and undefined variables. Don't expand glob patterns
-	test -z "${workshop_unsafe:-}" || set -e
-	set -uf
+	# Be strict unless someone asked explicitly for unsafety
+	if 	test -z "${workshop_unsafe:-}"
+	then
+		# Fail on errors and undefined vars. Don't expand glob patterns
+		set -euf
+	fi
 
 	# Don't expand glob patterns on zsh
 	unsetopt NO_MATCH  >/dev/null 2>&1 || :
@@ -177,10 +180,12 @@ workshop ()
 							test ${_dependency} = "workshop" ) &&
 						"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
 					then
+						# Workshop is running with an executable file
 						if test -z "${_run_once:-}"
 						then
 							cp "${_temp_module}" "${_found_module}"
 						else
+							# Use temporary module as path
 							_found_module="${_temp_module}"
 						fi
 					elif test -f "${_temp_module}"
@@ -205,11 +210,14 @@ workshop ()
 			# Dry-runs the module to check for errors
 			${SHELL} -n "${_found_module}" >/dev/null 2>&1
 
-			# Loads the module, calling its 'require' commands
+			# If workshop itself is a dependency and an executable
+			# is not available, download it.
 			if test "${_dependency}" != "workshop"
 			then
+				# Loads the module, calling its 'require' commands
 				. "${_found_module}"
-			else
+			elif test ! -z "${_run_once:-}"
+			then
 				# Redefine some variables after getting a disk instance
 				# of workshop
 				_executable="${_found_module}"
@@ -227,7 +235,8 @@ workshop ()
 		done
 	done
 
-	if test ! -z "${_temp_dir:-}"
+	# If not in run once mode, remove temporary files.
+	if test ! -z "${_temp_dir:-}" && test -z "${_run_once:-}"
 	then
 		rm -Rf "${_temp_dir}"
 	fi
