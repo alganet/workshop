@@ -14,7 +14,7 @@ posit ()
 # Runs tests on all Markdown files found in the given path
 posit_command_run ()
 {
-	find "${1:-${PWD}}" -type f | sort | grep ".md$" | posit_run_multi
+	find "${1:-$(pwd)}" -type f | sort | grep ".md$" | posit_run_multi
 }
 
 posit_run_multi ()
@@ -41,7 +41,7 @@ posit_run ()
 	    mkdir -m 700 "${_temp_dir}"
 	fi
 	cd "${_temp_dir}"  || exit
-	cp "${workshop_executable}" .
+	cp "${workshop_executable}" "./workshop"
 	chmod +x "./workshop"
 	while IFS='' read -r _element_line
 	do
@@ -168,15 +168,16 @@ posit_report ()
 posit_bootstrap_command ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
-		set -x
-		set +e
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
+		set -x
+		set +e
 		_output="\$(
 			PATH="\${PATH}:." \
-			workshop_path="\${PWD}:${workshop_path:-}" \
+			workshop_path="\$(pwd):${workshop_path:-}" \
 			workshop_unsafe=1 \
 			workshop_executable="${workshop_executable}" \
+			workshop_lib="\$(pwd)" \
 			${_on_prompt}
 		)"
 		_code=\$?
@@ -188,14 +189,15 @@ posit_bootstrap_command ()
 posit_bootstrap_test ()
 {
 	${SHELL} <<-EXTERNALSHELL 2>&1
+		unsetopt NO_MATCH  >/dev/null 2>&1 || :
+		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		set -x
 		set +e
 		PATH="\${PATH}:."
 		workshop_unsafe=1
-		workshop_path="\${PWD}:${workshop_path:-}"
+		workshop_path="\$(pwd):${workshop_path:-}"
 		workshop_executable="${workshop_executable}"
-		unsetopt NO_MATCH  >/dev/null 2>&1 || :
-		setopt SHWORDSPLIT >/dev/null 2>&1 || :
+		workshop_lib="\$(pwd)"
 		$(printf %s\\n "${_element}")
 
 		exit $?

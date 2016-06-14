@@ -13,6 +13,16 @@ workshop ()
 		return 0
 	fi
 
+	# Fail on errors and undefined variables. Don't expand glob patterns
+	test -z "${workshop_unsafe:-}" || set -e
+	set -uf
+
+	# Don't expand glob patterns on zsh
+	unsetopt NO_MATCH  >/dev/null 2>&1 || :
+
+	# Split words by whitespace when expanding variables on zsh
+	setopt SHWORDSPLIT >/dev/null 2>&1 || :
+
 	# Path to the executable that started workshop
 	_executable="${workshop_executable:-${1}}"
 
@@ -28,39 +38,44 @@ workshop ()
 	# Remove trailing file extension from main module
 	_main="${_main%%.*}"
 
+	# Module server hostname
+	_hostname='raw.githubusercontent.com'
+
 	# Default server to look for dependencies
-	_master="https://raw.githubusercontent.com/alganet/workshop/master/"
+	_master="https://${_hostname}/alganet/workshop/master/lib/"
 
 	# Use default server if non has been provided
 	_server="${workshop_server:-${_master}}"
 
-	# List of modules already loaded
-	_modules="${workshop_modules:-} : workshop "
-
-	# List of modules to be loaded, include main module by default
-	_dependencies="${workshop_modules:-}${workshop_modules:+ }${_main}"
+	# Make executable dir absolute
+	_executable_dir="$(cd "${_executable_dir}" || exit;pwd)"
 
 	# Absolute path to the executable that started workshop
-	workshop_executable="$(
-		cd "${_executable_dir}" || exit;pwd
-	)/$(
-		basename "${_executable}"
-	)"
+	workshop_executable="${_executable_dir}/$(basename "${_executable}")"
+
+	# Directory to save downloaded libraries
+	workshop_lib="${workshop_lib:-${_executable_dir}}"
 
 	# Path to look for other modules
-	workshop_path="${workshop_path:-${PWD}:$(dirname ${workshop_executable})}"
+	workshop_path="${workshop_path:-$(pwd):${workshop_lib}}"
 
 	shift 2 # Remove first two arguments, remaining are module arguments
 
-	# Fail on errors and undefined variables. Don't expand glob patterns
-	test -z "${workshop_unsafe:-}" || set -e
-	set -uf
+	if test -f "${_executable}"
+	then
+		# List of modules already loaded
+		_modules="${workshop_modules:-} : workshop "
 
-	# Don't expand glob patterns on zsh
-	unsetopt NO_MATCH  >/dev/null 2>&1 || :
+		# List of modules to be loaded, include main module by default
+		_dependencies="${workshop_modules:-} ${_main}"
+	else
+		# List of modules already loaded
+		_modules="${workshop_modules:-} : "
 
-	# Split words by whitespace when expanding variables on zsh
-	setopt SHWORDSPLIT >/dev/null 2>&1 || :
+		# List of modules to be loaded, include workshop and main
+		_dependencies="${workshop_modules:-} ${_main} workshop"
+		_run_once=1
+	fi
 
 	# Don't stop until all dependencies are met
 	while true 'Dependency Loop'
@@ -128,7 +143,7 @@ workshop ()
 				    mkdir -m 700 "${_temp_dir}"
 				fi
 				_remote_url="${_server}${_dependency}.sh"
-				_found_module="${PWD}/${_dependency}.sh"
+				_found_module="${workshop_lib}/${_dependency}.sh"
 				_temp_module="${_temp_dir}/${_dependency}.sh"
 
 				# Tests if current shell can check if commands exist
@@ -159,7 +174,12 @@ workshop ()
 						test "${_code:-0}" = 0 &&
 						"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
 					then
-						cp "${_temp_module}" "${_found_module}"
+						if test -z "${_run_once:-}"
+						then
+							cp "${_temp_module}" "${_found_module}"
+						else
+							_found_module="${_temp_module}"
+						fi
 					elif test -f "${_temp_module}"
 					then
 						# If not a valid module, delete it
