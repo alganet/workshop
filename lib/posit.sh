@@ -35,7 +35,7 @@ posit_run ()
 "
 	_current_dir="$(pwd)"
     _temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/posit.XXXXXX" 2>/dev/null)"
-    if test -z "${_temp_dir}"
+    if test -z "${_temp_dir:-}"
 	then
 		_temp_dir="${TMPDIR:-/tmp}/posit."$(od -An -N2 -i /dev/random)
 	    mkdir -m 700 "${_temp_dir}"

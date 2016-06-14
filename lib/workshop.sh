@@ -131,16 +131,19 @@ workshop ()
 			# If no module has been found, try to donwload it
 			if test -z "${_found_module:-}" && test ! -z "${_server:-}"
 			then
-			    _temp_dir="$(
-			    	mktemp -d \
-			    	"${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null
-		    	)"
-			    if test -z "${_temp_dir}"
+				if test -z "${_temp_dir:-}"
 				then
-					_temp_dir="${TMPDIR:-/tmp}/workshop."$(
-						od -An -N2 -i /dev/random
-					)
-				    mkdir -m 700 "${_temp_dir}"
+				    _temp_dir="$(
+				    	mktemp -d \
+				    	"${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null
+			    	)"
+				    if test -z "${_temp_dir:-}"
+					then
+						_temp_dir="${TMPDIR:-/tmp}/workshop."$(
+							od -An -N2 -i /dev/random
+						)
+					    mkdir -m 700 "${_temp_dir}"
+					fi
 				fi
 				_remote_url="${_server}${_dependency}.sh"
 				_found_module="${workshop_lib}/${_dependency}.sh"
@@ -170,8 +173,8 @@ workshop ()
 					test ! -f "${_temp_module}" ||
 						_head="$(head -n1 "${_temp_module}")"
 
-					if test "${_head}" = "#!/usr/bin/env workshop" &&
-						test "${_code:-0}" = 0 &&
+					if ( test "${_head}" = "#!/usr/bin/env workshop" ||
+							test ${_dependency} = "workshop" ) &&
 						"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
 					then
 						if test -z "${_run_once:-}"
@@ -203,7 +206,10 @@ workshop ()
 			${SHELL} -n "${_found_module}" >/dev/null 2>&1
 
 			# Loads the module, calling its 'require' commands
-			. "${_found_module}"
+			if test "${_dependency}" != "workshop"
+			then
+				. "${_found_module}"
+			fi
 
 			# Add up newly found dependencies to list
 			_dependencies="${_required:-} ${_dependencies:-}"
@@ -212,13 +218,8 @@ workshop ()
 		done
 	done
 
-	if test ! -z "${_temp_dir:-}"
-	then
-		rm -Rf "${_temp_dir}"
-	fi
-
 	# Call module with arguments, if there is at least one
-	if test -z "${1:-}"
+	if test -z "${*:-}"
 	then
 		"${_main}"
 	else
