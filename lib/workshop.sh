@@ -227,7 +227,7 @@ workshop ()
 		done
 	done
 
-	if test ! -z "${_temp_dir}"
+	if test ! -z "${_temp_dir:-}"
 	then
 		rm -Rf "${_temp_dir}"
 	fi
