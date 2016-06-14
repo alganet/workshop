@@ -12,7 +12,7 @@ install:
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
 
 test_script:
-  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL lib/workshop.sh posit run doc"
+  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL lib/workshop.sh posit run doc/testing.md"
 
 environment:
   matrix:
