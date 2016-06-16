@@ -42,3 +42,32 @@ untap_recount ()
 	echo "1..${_no}"
 }
 
+
+untap_matrix ()
+{
+	_tests=""
+
+	while read -r _tap_line; do
+		_tap_status="${_tap_line%% *}"
+		_tap_status="${_tap_status%%	*}"
+		_tap_test="${_tap_line#* }"
+		_tap_number="${_tap_test%%	*}"
+		case ${_tap_status} in
+			'ok' )
+				_tests="${_tests}${_tap_number}-${_tap_status} "
+				;;
+			'not' )
+				printf '%s\n' "${_tap_line}"
+				_tests="${_tests}${_tap_number}-${_tap_status} "
+				;;
+			'#' )
+				printf '%s\n' "${_tap_line}"
+				;;
+			* )
+				continue
+				;;
+		esac
+	done
+
+	printf '%s\n' ${_tests} | sort -n | uniq
+}
