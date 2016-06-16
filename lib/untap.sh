@@ -29,7 +29,7 @@ untap_recount ()
 				_no=$((_no + 1))
 				printf '%s' "${_tap_status} "
 				_tap_test="${_tap_line#* }"
-				_tap_desc="${_tap_test#*	}"
+				_tap_desc="${_tap_test#*}"
 				printf '%s' "${_no}	 "
 				printf '%s\n' "${_tap_desc# *}"
 				;;
