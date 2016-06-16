@@ -12,24 +12,24 @@ install:
   - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
 
 test_script:
-  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; $SHELL lib/workshop.sh posit run doc/testing.md"
+  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; SHELL=${posit_shell} $SHELL lib/workshop.sh posit run doc/testing.md"
 
 environment:
   matrix:
-    - SHELL: bash
+    - posit_shell: bash
       PACMAN: bash
       SHELLENV: C:\msys64\usr\bin\bash
-    - SHELL: dash
+    - posit_shell: dash
       PACMAN: dash
       SHELLENV: C:\msys64\usr\bin\bash
-    - SHELL: mksh
+    - posit_shell: mksh
       PACMAN: mksh
       SHELLENV: C:\msys64\usr\bin\bash
-    - SHELL: ksh
+    - posit_shell: ksh
       PACMAN: ksh
       SHELLENV: C:\msys64\usr\bin\bash
-    - SHELL: busybox sh
+    - posit_shell: busybox sh
       PACMAN: busybox
       SHELLENV: C:\msys64\usr\bin\bash
-    - SHELL: bash
+    - posit_shell: bash
       SHELLENV: C:\MinGW\msys\1.0\bin\sh

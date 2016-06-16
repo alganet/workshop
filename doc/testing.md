@@ -17,7 +17,7 @@
 	}
 
 [~]:test
-	$ workshop mymodule
+	$ workshop mymodule${BASH_VERSION:-}
 	Hello
 
 ## Requiring Dependencies

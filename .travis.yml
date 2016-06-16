@@ -16,62 +16,62 @@ before_install:
   - ${BREW:+brew install ${BREW}}
 
 script:
-  - $SHELL lib/workshop.sh posit run doc/testing.md
+  - SHELL=${posit_shell}; $SHELL lib/workshop.sh posit run doc/testing.md
 matrix:
   include:
-    - env: SHELL="dash" APTGET=""
+    - env: posit_shell="dash" APTGET=""
       os:  linux
 
-    - env: SHELL="bash" APTGET=""
+    - env: posit_shell="bash" APTGET=""
       os:  linux
 
-    - env: SHELL="bash" APTGET=""
+    - env: posit_shell="bash" APTGET=""
       os:  osx
 
-    - env: SHELL="posh" APTGET="posh"
+    - env: posit_shell="posh" APTGET="posh"
       os:  linux
 
-    - env: SHELL="mksh" APTGET="mksh"
+    - env: posit_shell="mksh" APTGET="mksh"
       os:  linux
 
-    - env: SHELL="zsh" APTGET="zsh"
+    - env: posit_shell="zsh" APTGET="zsh"
       os:  linux
 
-    - env: SHELL="pdksh" APTGET="pdksh"
+    - env: posit_shell="pdksh" APTGET="pdksh"
       os:  linux
 
-    - env: SHELL="yash" APTGET="yash"
+    - env: posit_shell="yash" APTGET="yash"
       os:  linux
 
-    - env: SHELL="ksh" APTGET="ksh"
+    - env: posit_shell="ksh" APTGET="ksh"
       os:  linux
 
-    - env: SHELL="zsh-beta" APTGET="zsh-beta"
+    - env: posit_shell="zsh-beta" APTGET="zsh-beta"
       os:  linux
 
-    - env: SHELL="busybox sh" APTGET="busybox"
+    - env: posit_shell="busybox sh" APTGET="busybox"
       os:  linux
 
-    - env: SHELL="zsh" BREW="zsh"
+    - env: posit_shell="zsh" BREW="zsh"
       os:  osx
 
-    - env: SHELL="ksh" BREW="ksh"
+    - env: posit_shell="ksh" BREW="ksh"
       os:  osx
 
-    - env: SHELL="mksh" BREW="mksh"
+    - env: posit_shell="mksh" BREW="mksh"
       os:  osx
 
-    - env: SHELL="dash" BREW="dash"
+    - env: posit_shell="dash" BREW="dash"
       os:  osx
 
-    - env: SHELL="bash2.05b" APTGET="bash2.05b" PPA="agriffis/bashes"
+    - env: posit_shell="bash2.05b" APTGET="bash2.05b" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash3.0.16" APTGET="bash3.0.16" PPA="agriffis/bashes"
+    - env: posit_shell="bash3.0.16" APTGET="bash3.0.16" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash3.2.48" APTGET="bash3.2.48" PPA="agriffis/bashes"
+    - env: posit_shell="bash3.2.48" APTGET="bash3.2.48" PPA="agriffis/bashes"
       os:  linux
 
-    - env: SHELL="bash4.2.45" APTGET="bash4.2.45" PPA="agriffis/bashes"
+    - env: posit_shell="bash4.2.45" APTGET="bash4.2.45" PPA="agriffis/bashes"
       os:  linux

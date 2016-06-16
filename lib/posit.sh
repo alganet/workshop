@@ -84,7 +84,7 @@ posit_run ()
 						_e=$?
 						${_errmode}
 
-						posit_report
+						posit_report "${_e}"
 
 						_current_prompt=
 						_element=
@@ -117,7 +117,7 @@ posit_run ()
 			_e=$?
 			${_errmode}
 
-			posit_report
+			posit_report "${_e}"
 
 			_on_prompt=
 			_element=
@@ -143,7 +143,7 @@ posit_run ()
 					_e=$?
 					${_errmode}
 
-					posit_report
+					posit_report "${_e}"
 					;;
 			esac
 			_element=
@@ -155,19 +155,18 @@ posit_run ()
 
 	echo "1..${_no}"
 	test "${_no}" = "${_ok}"
-	exit $?
 }
 
 posit_report ()
 {
-	if test ${_e} = 0
+	if test ${1} = 0
 	then
 		echo "ok ${_no}		${_name:-}"
 	else
 		echo "not ok ${_no}	${_name:-}"
 	fi
 
-	if test ${_e} = 0
+	if test ${1} = 0
 	then
 		_ok=$((_ok + 1))
 	else
@@ -177,7 +176,7 @@ posit_report ()
 
 posit_bootstrap_command ()
 {
-	${SHELL} <<-EXTERNALSHELL 2>&1
+	${posit_shell} <<-EXTERNALSHELL 2>&1
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		set -x
@@ -192,13 +191,14 @@ posit_bootstrap_command ()
 		)"
 		_code=\$?
 		test \${_code} = 0 &&
-			test _"\${_output}" = _'${_element}'
+			test _"\${_output}" = _'${_element}' && exit 0
+		exit 1
 	EXTERNALSHELL
 }
 
 posit_bootstrap_test ()
 {
-	${SHELL} <<-EXTERNALSHELL 2>&1
+	${posit_shell} <<-EXTERNALSHELL 2>&1
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		set -x
