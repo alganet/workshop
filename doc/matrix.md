@@ -5,11 +5,17 @@
 ---
 
 [~]:show
-	TEST_SHELLS='zsh bash'
+	TEST_SHELLS='busybox sh,zsh,bash'
+	IFS=','
 	for TARGET in $TEST_SHELLS
 	do
-		for shi in $TEST_SHELLS eval
+		IFS=' '
+		posit_shell="eval" $TARGET workshop posit run doc/testing.md
+		IFS=','
+		for shi in $TEST_SHELLS
 		do
-			posit_shell=$shi $TARGET workshop posit run doc/testing.md
+			IFS=' '
+			posit_shell="$shi" $TARGET workshop posit run doc/testing.md
+			IFS=','
 		done
 	done | workshop untap compare
