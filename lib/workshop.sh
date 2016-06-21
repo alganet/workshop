@@ -188,8 +188,7 @@ resolve ()
 				_head="$(head -n1 "${_temp_module}")"
 
 			if ( test "${_head}" = "#!/usr/bin/env workshop" ||
-					test ${_dependency} = "workshop" ) &&
-				"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
+					test ${_dependency} = "workshop" )
 			then
 				# Workshop is running with an executable file
 				if test -z "${workshop_detached:-}"
