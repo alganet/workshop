@@ -177,7 +177,10 @@ posit_run ()
 }
 
 
-posit_report_test () ( posit_report "${@:-}" )
+posit_report_test ()
+{
+	posit_report "${@:-}"
+}
 
 posit_report ()
 {
