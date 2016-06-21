@@ -212,7 +212,7 @@ posit_bootstrap_command ()
 		set -x
 		set +e
 		test _"\$(
-			PATH="\.:${PATH}" \
+			PATH=".:${PATH}" \
 			workshop_path="\$(pwd):${workshop_path:-}" \
 			workshop_unsafe=1 \
 			workshop_executable="${workshop_executable}" \
