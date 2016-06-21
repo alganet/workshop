@@ -6,42 +6,42 @@ build:
 
     # Install apt-get dependencies
     - ${APTGET:+sudo apt-get install -y ${APTGET}}
-    - SHELL${posit_shell:-sh}; ; ${SHELL} lib/workshop.sh posit run doc/testing.md
+    - SHELL=${SHELL:-sh}; ${SHELL} lib/workshop.sh posit run doc/testing.md
 
 env:
-  - posit_shell"dash"
+  - SHELL="dash"
 matrix:
   include:
     - env:
-      - posit_shell"bash"
+      - SHELL="bash"
       - APTGET=""
 
     - env:
-      - posit_shell"posh"
+      - SHELL="posh"
       - APTGET="posh"
 
     - env:
-      - posit_shell"mksh"
+      - SHELL="mksh"
       - APTGET="mksh"
 
     - env:
-      - posit_shell"zsh"
+      - SHELL="zsh"
       - APTGET="zsh"
 
     - env:
-      - posit_shell"pdksh"
+      - SHELL="pdksh"
       - APTGET="pdksh"
 
     - env:
-      - posit_shell"yash"
+      - SHELL="yash"
       - APTGET="yash"
 
     - env:
-      - posit_shell"ksh"
+      - SHELL="ksh"
       - APTGET="ksh"
 
     - env:
-      - posit_shell"zsh-beta" APTGET="zsh-beta"
+      - SHELL="zsh-beta" APTGET="zsh-beta"
 
     - env:
-      - posit_shell"busybox sh" APTGET="busybox"
+      - SHELL="busybox sh" APTGET="busybox"

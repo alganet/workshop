@@ -108,6 +108,7 @@ posit_run ()
 
 		case ${_type%% *} in
 			'copy' )
+				mkdir -p "${_temp_dir}/${_value}"
 				cp -R "${_current_dir}/${_value}" "${_temp_dir}/${_value}"
 				;;
 		esac
