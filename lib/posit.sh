@@ -224,7 +224,7 @@ posit_bootstrap_command ()
 
 posit_bootstrap_test ()
 {
-	PATH="\.:${PATH}" \
+	PATH=".:${PATH}" \
 	workshop_unsafe=1 \
 	workshop_path="$(pwd):${workshop_path:-}" \
 	workshop_executable="${workshop_executable}" \
@@ -244,7 +244,7 @@ posit_bootstrap_test ()
 
 posit_bootstrap_show ()
 {
-	PATH="\.:${PATH}" \
+	PATH=".:${PATH}" \
 	workshop_unsafe=1 \
 	workshop_path="$(pwd):${workshop_path:-}" \
 	workshop_executable="${workshop_executable}" \
