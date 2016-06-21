@@ -14,6 +14,7 @@ posit ()
 # Runs tests on all Markdown files found in the given path
 posit_command_run ()
 {
+	flash "Finding tests..."
 	find "${1:-$(pwd)}" -type f | sort | grep ".md$" | posit_run_multi
 }
 
@@ -29,6 +30,7 @@ posit_option_help ()
 
 posit_run_multi ()
 {
+	flash "Parsing Test Files..."
 	while IFS='' read -r _file_path
 	do
 		doc_command_elements "${_file_path}" "code,h1,h2,h3,h4,h5,h6"
@@ -44,15 +46,11 @@ posit_run ()
 	_n="
 "
 	_current_dir="$(pwd)"
-    _temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/posit.XXXXXX" 2>/dev/null)"
-    if test -z "${_temp_dir:-}"
-	then
-		_temp_dir="${TMPDIR:-/tmp}/posit."$(od -An -N2 -i /dev/random)
-	    mkdir -m 700 "${_temp_dir}"
-	fi
+    _temp_dir="$(tempdir posit)"
 	cd "${_temp_dir}"  || exit
 	cp "${workshop_executable}" "./workshop"
 	chmod +x "./workshop"
+	flash
 	while IFS='' read -r _element_line
 	do
 		case "${_element_line%%	*}" in
@@ -61,6 +59,7 @@ posit_run ()
 				;;
 			'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' )
 				_element_heading="${_element_line#*	}"
+				_name="${_element_heading}"
 				;;
 			'code' )
 				_raw_line="${_element_line#*	}"
@@ -102,6 +101,17 @@ posit_run ()
 				;;
 		esac
 
+
+		_namespace="${_element_href:-}"
+		_type="${_namespace%%:*}"
+		_value="${_namespace##*:}"
+
+		case ${_type%% *} in
+			'copy' )
+				cp -R "${_current_dir}/${_value}" "${_temp_dir}/${_value}"
+				;;
+		esac
+
 		test ! -z "${_end_of_element:-}" || continue
 
 		_end_of_element=
@@ -126,7 +136,6 @@ posit_run ()
 
 		if test ! -z "${_element:-}"
 		then
-			_name="${_element_heading:-}"
 			_namespace="${_element_href:-}"
 			_type="${_namespace%%:*}"
 			_value="${_namespace##*:}"
@@ -135,7 +144,7 @@ posit_run ()
 				'file' )
 					printf %s\\n "${_element}" > "${_file}"
 					;;
-				'test' )
+				'test')
 					_no=$((_no + 1))
 
 					set +e
@@ -143,7 +152,17 @@ posit_run ()
 					_e=$?
 					${_errmode}
 
-					posit_report "${_e}"
+					posit_report_${_type%% *} "${_e}"
+					;;
+				'show')
+					_no=$((_no + 1))
+
+					set +e
+					posit_bootstrap_show
+					_e=$?
+					${_errmode}
+
+					posit_report_${_type%% *} "${_e}"
 					;;
 			esac
 			_element=
@@ -157,13 +176,16 @@ posit_run ()
 	test "${_no}" = "${_ok}"
 }
 
+
+posit_report_test () ( posit_report "${@:-}" )
+
 posit_report ()
 {
 	if test ${1} = 0
 	then
-		echo "ok ${_no}		${_name:-}"
+		echo "ok	${_no}	${_name:-}"
 	else
-		echo "not ok ${_no}	${_name:-}"
+		echo "not ok	${_no}	${_name:-}"
 	fi
 
 	if test ${1} = 0
@@ -174,43 +196,64 @@ posit_report ()
 	fi
 }
 
+posit_report_show ()
+{
+	posit_report "${@:-}" >/dev/null; echo "${_test_out:-}"
+}
+
 posit_bootstrap_command ()
 {
-	${posit_shell} <<-EXTERNALSHELL 2>&1
+	${posit_shell:-/usr/bin/env sh} <<-EXTERNALSHELL 2>&1
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		set -x
 		set +e
-		_output="\$(
-			PATH="\${PATH}:." \
+		test _"\$(
+			PATH="\.:${PATH}" \
 			workshop_path="\$(pwd):${workshop_path:-}" \
 			workshop_unsafe=1 \
 			workshop_executable="${workshop_executable}" \
 			workshop_lib="\$(pwd)" \
 			${_on_prompt}
-		)"
-		_code=\$?
-		test \${_code} = 0 &&
-			test _"\${_output}" = _'${_element}' && exit 0
-		exit 1
+		)" = _"${_element}" || exit 1
 	EXTERNALSHELL
 }
 
 posit_bootstrap_test ()
 {
-	${posit_shell} <<-EXTERNALSHELL 2>&1
+	PATH="\.:${PATH}" \
+	workshop_unsafe=1 \
+	workshop_path="$(pwd):${workshop_path:-}" \
+	workshop_executable="${workshop_executable}" \
+	workshop_lib="$(pwd)" \
+	${posit_shell:-/usr/bin/env sh} <<-EXTERNALSHELL 2>&1
 		unsetopt NO_MATCH  >/dev/null 2>&1 || :
 		setopt SHWORDSPLIT >/dev/null 2>&1 || :
 		set -x
 		set +e
-		PATH="\${PATH}:."
-		workshop_unsafe=1
-		workshop_path="\$(pwd):${workshop_path:-}"
-		workshop_executable="${workshop_executable}"
-		workshop_lib="\$(pwd)"
-		$(printf %s\\n "${_element}")
+		$(printf '%s\n' "${_element}")
 
-		exit $?
+		exit \$?
 	EXTERNALSHELL
 
 }
+
+
+posit_bootstrap_show ()
+{
+	PATH="\.:${PATH}" \
+	workshop_unsafe=1 \
+	workshop_path="$(pwd):${workshop_path:-}" \
+	workshop_executable="${workshop_executable}" \
+	workshop_lib="$(pwd)" \
+	${posit_shell:-/usr/bin/env sh} <<-EXTERNALSHELL 2>&1
+		unsetopt NO_MATCH  >/dev/null 2>&1 || :
+		setopt SHWORDSPLIT >/dev/null 2>&1 || :
+		set +e
+		$(printf '%s\n' "${_element}")
+
+		exit \$?
+	EXTERNALSHELL
+
+}
+

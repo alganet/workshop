@@ -8,7 +8,7 @@ require 'dispatch' 'parsed'
 #
 doc ()
 {
-	dispatch 'doc' "${@:-README.md}"
+	dispatch 'doc' "${@:-}"
 }
 
 # Displays a Markdown document friendly to terminals
@@ -20,7 +20,7 @@ doc_command_show ()
 # Outputs a list of elements from a Markdown document
 doc_command_elements ()
 {
-	_file="${1:-README.md}"
+	_file="${1:-}"
 	shift
 
 	( cat "${_file}"; echo ) |
@@ -49,9 +49,7 @@ doc_filter ()
 				if test '*' = "${_selector}"
 				then
 					_element=1 # Inside an element
-					test -z "${_meta}" || echo "${_meta}
-	"
-					echo "${_line}"
+					printf %s\\n "${_line}"
 				else
 					# Check all selectors in the list
 					_ifs="${IFS}"
@@ -62,9 +60,7 @@ doc_filter ()
 						if test "${_sel}" = "${_current}"
 						then
 							_element=1 # Inside an element
-							test -z "${_meta}" || echo "${_meta}
-		"
-							echo "${_line}"
+							printf %s\\n "${_line}"
 						fi
 					done
 					IFS="${_ifs}"
@@ -74,7 +70,9 @@ doc_filter ()
 
 			# Line is empty, element ended
 			'' )
-				test -z "${_element:-}" || echo "${_line}"
+						test -z "${_meta}" || echo "${_meta}
+	"
+				test -z "${_element:-}" || printf %s\\n "${_line}"
 				_element=
 				;;
 		esac
@@ -204,6 +202,7 @@ doc_parse_draw ()
 # Parses a Markdown document into a list of elements
 doc_parse_elements ()
 {
+	flash "Parsing..."
 	doc_parse_tokens
 
 	# Overall format of a code fence
@@ -347,4 +346,5 @@ doc_parse_elements ()
 	fence "ticked" "${_ticked}"
 	fence "tilded" "${_tilded}"
 
+	flash
 }

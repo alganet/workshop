@@ -178,8 +178,8 @@
 ---
 
 	$ workshop posit run welcoming_the_world.md
-	ok 1		echo Hello World
-	ok 2		echo Ola Mundo
+	ok	1	echo Hello World
+	ok	2	echo Ola Mundo
 	1..2
 
 ## Running Test Scripts
@@ -198,7 +198,7 @@
 ---
 
 	$ workshop posit run functions.md
-	ok 1		Creating Functions
+	ok	1	Creating Functions
 	1..1
 
 ## Using Test Fixtures
@@ -221,7 +221,7 @@
 ---
 
 	$ workshop posit run cat_display.md
-	ok 1		cat hello.txt
+	ok	1	cat hello.txt
 	1..1
 
 ## Markdown parsing

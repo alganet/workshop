@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# workshop, the module loader
+# workshop, the loader
 #
 # Loads modules and their dependencies, downloading them from a server
 # if none is found locally.
@@ -89,17 +89,19 @@ resolve ()
 	if test -f "${workshop_executable}"
 	then
 		# List of modules already loaded
-		_modules="${workshop_modules:-} : workshop "
+		_modules="${workshop_modules:-} : workshop resolve tempdir "
 
 		# List of modules to be loaded, include main module by default
 		_dependencies="${workshop_modules:-} ${_main}"
 	else
 		# List of modules already loaded
-		_modules="${workshop_modules:-} : "
+		_modules="${workshop_modules:-} : resolve tempdir "
 
 		# List of modules to be loaded, include workshop and main
 		_dependencies="${workshop_modules:-} ${_main} workshop"
-		_run_once=1
+
+		# Workshop is running from sh, detached from an executable file
+		workshop_detached=1
 	fi
 
 	# Don't stop until all dependencies are met
@@ -156,42 +158,28 @@ resolve ()
 		then
 			if test -z "${_temp_dir:-}"
 			then
-			    _temp_dir="$(
-			    	mktemp -d \
-			    	"${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null
-		    	)"
-			    if test -z "${_temp_dir:-}"
-				then
-					_temp_dir="${TMPDIR:-/tmp}/workshop."$(
-						od -An -N2 -i /dev/random
-					)
-				    mkdir -m 700 "${_temp_dir}"
-				fi
+				_temp_dir="$(tempdir workshop)"
 			fi
 			_remote_url="${workshop_server}${_dependency}.sh"
 			_found_module="${workshop_lib}/${_dependency}.sh"
 			_temp_module="${_temp_dir}/${_dependency}.sh"
 
-			# Tests if current shell can check if commands exist
-			if ! command -v workshop >/dev/null 2>&1
+			flash "Downloading '${_dependency}' from '${_remote_url}'."
+			httpgetfile "${_remote_url}" "${_temp_module}" &&
+				_downloaded=$? ||
+				_downloaded=$?
+			if test "${_downloaded}" = '127'
 			then
+				# Module cannot be retrieved
+				flash "No download tool available" \
+				       "to retrieve '${_dependency}'."
 				return 127
-			fi
-
-			# Check for popular HTTP download tools
-			if command -v curl >/dev/null 2>&1
+			elif test "${_downloaded}" = '1'
 			then
-				curl --fail -L "${_remote_url}" \
-					2>/dev/null > "${_temp_module}" ||
-						_code=$?
-			elif command -v wget >/dev/null 2>&1
-			then
-				wget -qO- "${_remote_url}" \
-					2>/dev/null  > "${_temp_module}" ||
-						_code=$?
-			else
 				# Module cannot be found
-				return 127
+				flash "Failed to download '${_dependency}'" \
+				       "from '${_remote_url}'."
+				return 1
 			fi
 
 			# Tests if downloaded file is a workshop module
@@ -204,7 +192,7 @@ resolve ()
 				"${SHELL}" -n "${_temp_module}" >/dev/null 2>&1
 			then
 				# Workshop is running with an executable file
-				if test -z "${_run_once:-}"
+				if test -z "${workshop_detached:-}"
 				then
 					cp "${_temp_module}" "${_found_module}"
 				else
@@ -236,7 +224,7 @@ resolve ()
 		then
 			# Loads the module, calling its 'require' commands
 			. "${_found_module}"
-		elif test ! -z "${_run_once:-}"
+		elif test ! -z "${workshop_detached:-}"
 		then
 			# Redefine some variables after getting a disk instance
 			# of workshop
@@ -255,7 +243,7 @@ resolve ()
 	done ; done
 
 	# If not in run once mode, remove temporary files.
-	if test ! -z "${_temp_dir:-}" && test -z "${_run_once:-}"
+	if test ! -z "${_temp_dir:-}" && test -z "${workshop_detached:-}"
 	then
 		rm -Rf "${_temp_dir}"
 	fi
@@ -264,6 +252,53 @@ resolve ()
 	{
 		resolve "${@:-}"
 	}
+}
+
+tempdir ()
+{
+    _temp_dir="$(
+    	mktemp -d \
+    	"${TMPDIR:-/tmp}/workshop.XXXXXX" 2>/dev/null || :
+	)"
+    if test -z "${_temp_dir:-}"
+	then
+		_temp_dir="${TMPDIR:-/tmp}/workshop."$(
+			od -An -N2 -i /dev/random | sed 's/[ 	]*//m'
+		)
+	    mkdir -m 'u+rwx' "${_temp_dir}"
+	fi
+
+	printf %s "${_temp_dir}"
+}
+
+flash ()
+{
+	if test -z "${workshop_tput_el:-}"
+	then
+		workshop_tput_el="$(tput 'el' 2>/dev/null || :)"
+		workshop_tput_el1="$(tput 'el1' 2>/dev/null || :)"
+	fi
+
+	printf %s\\r "${workshop_tput_el}${workshop_tput_el1}${*:-}" 1>&2
+}
+
+httpgetfile ()
+{
+	if curl --help >/dev/null 2>&1
+	then
+		curl --fail -L "${1}" \
+			2>/dev/null > "${2}" || return 1
+
+		return 0
+	elif wget --help >/dev/null 2>&1
+	then
+		wget -qO- "${1}" \
+			2>/dev/null  > "${2}" || return 1
+
+		return 0
+	fi
+
+	return 127
 }
 
 workshop "${0}" "${@:-}"
