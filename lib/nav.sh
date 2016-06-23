@@ -571,6 +571,7 @@ nav_launch ()
 	printf \\r
 	PS4="\\r+ "
 	nav_push_state "${nav_input}"
+	exec </dev/tty
 	nav_keypress init
 	nav_keyloop
 	printf '\033[?25h' # Show Blinking Cursor
