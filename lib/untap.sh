@@ -63,7 +63,7 @@ untap_compare ()
 					_name="${1:-${_index}}"
 					shift || :
 				fi
-				flash "Running matrix [${_name}]	${_tap_line}"
+				echo "# [${_name}]	${_tap_line}"
 				;;
 			* )
 				;;
@@ -86,8 +86,6 @@ untap_compare ()
 			)"
 		fi
 	done
-
-	flash
 
 	(
 		printf %s\\n "${_tests}" |

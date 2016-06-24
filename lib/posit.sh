@@ -107,7 +107,7 @@ posit_run ()
 		_value="${_namespace##*:}"
 
 		case ${_type%% *} in
-			'copy' )
+			'folder' )
 				mkdir -p "${_temp_dir}/${_value}"
 				cp -R "${_current_dir}/${_value}" "${_temp_dir}/"
 				;;

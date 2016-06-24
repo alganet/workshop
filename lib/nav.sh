@@ -1,5 +1,33 @@
 #!/usr/bin/env workshop
 
+require 'dispatch'
+
+nav ()
+{
+	dispatch 'nav' "${@:-}"
+}
+
+nav_option_h () ( nav_command_help )
+nav_option_help () ( nav_command_help )
+nav_command_help ()
+{
+	cat <<-NAVHELP
+		Usage: nav [OPTIONS] COMMAND
+
+		Commands: open SPEC  Opens a navigation bar with SPEC buttons
+
+		Options: --help      Displays help
+
+	NAVHELP
+}
+
+nav_buttonpress ()
+{
+	${SHELL:-/usr/bin/env sh} <<-NAVCOMMAND 2>&1 | nav_push_out
+		${nav_value:-echo '${nav_text}'}
+	NAVCOMMAND
+}
+
 nav_read_char ()
 {
 	IFS= read -n1 nav_key
@@ -8,6 +36,14 @@ nav_read_char ()
 nav_dd_char ()
 {
 	nav_key="$(dd count=1 bs=1 2>/dev/null)"
+}
+
+nav_push_out ()
+{
+	cat | while read -r _line
+	do
+		nav_push_line "${_line}"
+	done
 }
 
 nav_push_line ()
@@ -35,6 +71,9 @@ nav_push_line ()
 		printf "${nav_cursor_buffer_down}"
 		printf \\n\\r
 		printf "${nav_cursor_buffer_up}"
+	else
+		printf \\n\\r
+		printf "${nav_cursor_down}"
 	fi
 
 	if test -z ${nav_buffer:-} && test "${nav_scroll_top}" = 0
@@ -43,28 +82,6 @@ nav_push_line ()
 	fi
 
 	printf "${nav_sc}"
-}
-
-nav_buttonpress ()
-{
-	case _"${nav_text}"_ in
-		_"About"_ )
-			nav_push_line "nav is a terminal navigation bar"
-			nav_push_line
-			nav_push_line "It allows creating interactive menu bars"
-			nav_push_line "with keyboard and event support."
-			nav_push_line
-			;;
-		_"Exit"_ )
-			nav_exit
-			;;
-		* )
-			eval ${nav_value:-echo ${nav_text}} | while read -r nav_line_press
-			do
-				nav_push_line "${nav_line_press}"
-			done
-			;;
-	esac
 }
 
 nav_keypress ()
@@ -145,7 +162,7 @@ nav_keypress ()
 			;;
 		l_ct )
 			nav_scroll_top=$nav_rows
-			tput clear
+			tput clear 2>/dev/null || printf '\033[2J'
 			printf "${nav_sc}"
 		;;
 		tab_s | back_ )
@@ -410,11 +427,13 @@ nav_push_state ()
 	printf "${nav_rc}"
 	nav_focus=1
 	nav_contents="${1:-}"
-	nav_chars="$(printf %s "${nav_contents:-}" | wc -m)"
+	nav_chars="$(nav_frame | wc -m)"
 	if test ! -z ${nav_buffer:-}
 	then
-		for i in $(seq 1 ${nav_buffer:-1})
+		_i=1
+		while test "${_i}" -lt ${nav_buffer:--1}
 		do
+			_i=$((_i + 1))
 			printf \\n\\r
 			printf "${nav_end_clean}"
 			printf "${nav_sc}"
@@ -429,10 +448,14 @@ nav_push_state ()
 		if test $nav_new_buffer -gt ${nav_buffer:-0}
 		then
 			nav_buffer=${nav_new_buffer}
-			nav_cursor_buffer_down="$(tput cud $nav_buffer)"
-			nav_cursor_buffer_up="$(tput cuu $nav_buffer)"
-			for i in $(seq 1 $nav_buffer)
+			nav_cursor_buffer_down="$(tput cud $nav_buffer ||
+				printf "\033[${nav_buffer}B")"
+			nav_cursor_buffer_up="$(tput cuu $nav_buffer ||
+				printf "\033[${nav_buffer}A")"
+			_i=1
+			while test "${_i}" -lt ${nav_buffer:--1}
 			do
+				_i=$((_i + 1))
 				printf \\n\\r
 				printf "${nav_end_clean}"
 				printf "${nav_sc}"
@@ -450,8 +473,10 @@ nav_push_state ()
 
 nav_exit ()
 {
-	for i in $(seq 1 ${nav_buffer:-1})
+	_i=1
+	while test "${_i}" -lt ${nav_buffer:--1}
 	do
+		_i=$((_i + 1))
 		if test ${nav_scroll_top:-0} -gt $((${nav_buffer:-} + 1))
 		then
 			printf \\n\\r
@@ -473,19 +498,20 @@ nav_exit ()
 	exit
 }
 
-nav_launch ()
+nav_command_open ()
 {
 	nav_char='~'
 	printf "\033[?25l~ " # Hide Blinking Cursor
-	tput sc
+	tput sc 2>/dev/null  || printf '\033[s'
 	nav_cols="$(stty size | cut -d ' ' -f2)"
 	nav_progress_total="$(expr $nav_cols / 19)"
-	nav_progress_steps="$(seq 1 ${nav_progress_total})"
 	nav_progress_done=0
 	nav_progress_ ()
 	{
-		for i in $nav_progress_steps
+		_i=1
+		while test "${_i}" -lt "${nav_progress_total}"
 		do
+			_i=$((_i + 1))
 			nav_progress_done=$((nav_progress_done + 1))
 			if test $nav_progress_done -lt $nav_cols
 			then
@@ -493,26 +519,26 @@ nav_launch ()
 			fi
 		done
 	}
-	nav_sc="$(tput sc)"
-	nav_rc="$(tput rc)"
+	nav_sc="$(tput sc 2>/dev/null  || printf '\033[s')"
+	nav_rc="$(tput rc 2>/dev/null  || printf '\033[u')"
 	nav_progress_
-	nav_end_clean1="$(tput el1)"
+	nav_end_clean1="$(tput el1 2>/dev/null  || printf '\033[1K')"
 	trap "nav_exit" 2
 	nav_progress_
-	nav_end_clean="$(tput el)"
+	nav_end_clean="$(tput el 2>/dev/null  || printf '\033[K')"
 	nav_rows="$(stty size | cut -d ' ' -f1)"
 	nav_progress_
-	nav_input="${*:-[ About ] [ Exit ]}"
+	nav_input="${1:-[ About nav ] [ Exit ]}"
 	nav_stack=0
 	nav_start="${nav_char}"
 	nav_end=''
-	tput smcup > /dev/null
+	tput smcup > /dev/null 2>/dev/null  || printf '\033[47h' > /dev/null
 	nav_progress_
-	nav_cursor_up="$(printf %s $(tput cud 1))"
+	nav_cursor_up="$(tput cud 1 2>/dev/null  || printf '\033[1A')"
 	nav_progress_
-	nav_cursor_down="$(printf %s $(tput cuu 1))"
+	nav_cursor_down="$(tput cuu 1 2>/dev/null  || printf '\033[1B')"
 	nav_progress_
-	nav_restore_screen="$(tput rmcup)"
+	nav_restore_screen="$(tput rmcup 2>/dev/null  || printf '\033[47l')"
 	nav_esc="$(printf '\E')"
 	nav_progress_
 	nav_33="$(printf '\033')"
@@ -548,7 +574,7 @@ nav_launch ()
 	nav_previous_stty="$(stty -g)"
 	stty raw -echo -isig -ixon -ixoff intr '' -tostop time 0 2>/dev/null
 	nav_progress_
-	nav_terminal_positions=''
+	nav_terminal_pos=''
 	printf '\033[6n'
 	$nav_get_key
 	if test _"${nav_key}"_ = _"${nav_33}"_
@@ -557,23 +583,22 @@ nav_launch ()
 		$nav_get_key
 		while test _"${nav_key}"_ != _"R"_
 		do
-			nav_terminal_positions="${nav_terminal_positions}${nav_key}"
+			nav_terminal_pos="${nav_terminal_pos}${nav_key}"
 			$nav_get_key
 		done
 		nav_progress_
 	fi
-	nav_row_position="$(printf %s "${nav_terminal_positions}" |
+	nav_row_position="$(printf %s "${nav_terminal_pos}" |
 		cut -d ';' -f1)"
 	nav_scroll_top=$((nav_rows - nav_row_position + 1))
-	tput rmcup
+	tput rmcup 2>/dev/null  || printf '\033[47l'
 	nav_progress_
 	unset -f nav_progress_
 	printf \\r
+	PS4="\\r+ "
 	nav_push_state "${nav_input}"
 	nav_keypress init
 	nav_keyloop
 	printf '\033[?25h' # Show Blinking Cursor
 	nav_exit
 }
-
-nav () ( nav_launch "${@:-}" )
