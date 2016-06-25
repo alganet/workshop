@@ -109,7 +109,7 @@ serve ()
 	while true
 	do
 		echo "Connecting..."
-		( ${connector1} || "${connector2}") < "${buffer_out}" > "${buffer_in}" &
+		( ${connector1} || ${connector2} ) < "${buffer_out}" > "${buffer_in}" &
 		serve_parse_request > "${buffer_out}" &
 		wait
 		echo "Dropped..."
