@@ -17,7 +17,7 @@ workshop ()
 	if 	test -z "${workshop_unsafe:-}"
 	then
 		# Fail on errors and undefined vars. Don't expand glob patterns
-		set -euf
+		set -eufm
 	fi
 
 	# Don't expand glob patterns on zsh
@@ -165,7 +165,7 @@ resolve ()
 			_temp_module="${_temp_dir}/${_dependency}.sh"
 
 			flash "Downloading '${_dependency}' from '${_remote_url}'."
-			httpgetfile "${_remote_url}" "${_temp_module}" &&
+			fetchfile "${_remote_url}" "${_temp_module}" &&
 				_downloaded=$? ||
 				_downloaded=$?
 			if test "${_downloaded}" = '127'
@@ -281,11 +281,11 @@ flash ()
 	printf %s\\r "${workshop_tput_el}${workshop_tput_el1}${*:-}" 1>&2
 }
 
-httpgetfile ()
+fetchfile ()
 {
 	if curl --help >/dev/null 2>&1
 	then
-		curl --fail -L "${1}" \
+		curl --fail -kL "${1}" \
 			2>/dev/null > "${2}" || return 1
 
 		return 0

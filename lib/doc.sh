@@ -141,7 +141,7 @@ doc_parse_draw ()
 		replace "\(.*\)$" "${_bold}\1${_reset}"
 		hold
 		get
-		replace '........' ''
+		replace '..........' ''
 		replaceall 'h1char' '='
 		replace "\(.*\)$" "${_dim}\1${_reset}"
 		keep
@@ -156,7 +156,7 @@ doc_parse_draw ()
 		replace "\(.*\)$" "${_bold}\1${_reset}"
 		hold
 		get
-		replace '........' ''
+		replace '..........' ''
 		replaceall 'h2char' '-'
 		replace "\(.*\)$" "${_dim}\1${_reset}"
 		keep

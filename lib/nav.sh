@@ -7,6 +7,8 @@ nav ()
 	dispatch 'nav' "${@:-}"
 }
 
+nav_command_open () ( nav_open "${@:-}" )
+
 nav_option_h () ( nav_command_help )
 nav_option_help () ( nav_command_help )
 nav_command_help ()
@@ -23,9 +25,7 @@ nav_command_help ()
 
 nav_buttonpress ()
 {
-	${SHELL:-/usr/bin/env sh} <<-NAVCOMMAND 2>&1 | nav_push_out
-		${nav_value:-echo '${nav_text}'}
-	NAVCOMMAND
+	eval "${nav_value:-echo '${nav_text}'}" 2>&1 | nav_push_out
 }
 
 nav_read_char ()
@@ -60,7 +60,7 @@ nav_push_line ()
 		nav_scroll_top=$((nav_scroll_top - 1))
 	fi
 
-	printf %s "${*:-}"
+	printf "${@:-}"
 	printf "${nav_end_clean}"
 	printf '\r'
 	printf "${nav_cursor_up}"
@@ -158,7 +158,7 @@ nav_keypress ()
 			nav_focus=$nav_max_focus
 			;;
 		ret_ )
-			nav_buttonpress
+			${nav_buttonpress:-nav_buttonpress}
 			;;
 		l_ct )
 			nav_scroll_top=$nav_rows
@@ -189,6 +189,12 @@ nav_keypress ()
 	esac
 
 	nav_frame "${@:-}"
+}
+
+nav_frame_prepare ()
+{
+	nav_frame
+	printf "${nav_rc}"
 }
 
 nav_frame ()
@@ -230,6 +236,7 @@ nav_frame ()
 				;;
 		esac
 	done
+	printf "${nav_end_clean}"
 	IFS=
 	nav_max_focus="${nav_closed:-0}"
 }
@@ -498,7 +505,7 @@ nav_exit ()
 	exit
 }
 
-nav_command_open ()
+nav_open ()
 {
 	nav_char='~'
 	printf "\033[?25l~ " # Hide Blinking Cursor

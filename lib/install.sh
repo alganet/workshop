@@ -55,5 +55,7 @@ install_command_prefix ()
 	. "${workshop_prefix}/lib/workshop/workshop.sh"
 	EXECUTABLE
 
+	chmod +x "${workshop_prefix}/bin/workshop"
+
 	flash "workshop installed on '${workshop_prefix}'."
 }

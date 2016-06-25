@@ -22,6 +22,7 @@ accordingly using `environment.sh` files that you can tweak:
 	APTGET='bash dash ksh mksh pdksh posh yash busybox zsh-beta bash2.05b bash3.0.16 bash3.2.48 bash4.2.45'
 	SHELLS='dash,bash,zsh,mksh,busybox sh,ksh,pdksh,posh,yash,zsh-beta,bash2.05b,bash3.0.16,bash3.2.48,bash4.2.45'
 
+	add-apt-repository ppa:agriffis/bashes -y
 	apt-get update
 	apt-get install -y ${APTGET}
 
@@ -39,11 +40,11 @@ accordingly using `environment.sh` files that you can tweak:
 
 [~]:file:msys-environment.sh
 	PACMAN='zsh mksh bash busybox'
-	SHELLS='bash'
+	SHELLS='bash,zsh,mksh,busybox sh'
 
-	: pacman --noconfirm -Sy --needed pacman-mirrors
-	: pacman --noconfirm -Sy
-	: pacman --noconfirm -Sy $PACMAN
+	pacman --noconfirm -Sy --needed pacman-mirrors
+	pacman --noconfirm -Sy
+	pacman --noconfirm -Sy $PACMAN
 
 ## Matrix
 
