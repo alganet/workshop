@@ -52,7 +52,7 @@ install_command_prefix ()
 	fi
 
 	# Copy contents of current running instance to install folder
-	cp -Ra "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
+	cp -R "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
 
 	# Create a new executable pointing to installed workshop
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"
