@@ -46,7 +46,7 @@ install_command_prefix ()
 	then
 		mkdir -p "${workshop_prefix}/bin"
 	fi
-	if test ! -d
+	if test ! -d "${workshop_prefix}/lib/workshop"
 	then
 		mkdir -p "${workshop_prefix}/lib/workshop"
 	fi
