@@ -42,8 +42,14 @@ install_command_prefix ()
 	rm -Rf "${workshop_prefix}/bin/workshop"
 
 	# Create new folders
-	mkdir -p "${workshop_prefix}/bin"
-	mkdir -p "${workshop_prefix}/lib/workshop"
+	if test ! -d "${workshop_prefix}/bin"
+	then
+		mkdir -p "${workshop_prefix}/bin"
+	fi
+	if test ! -d
+	then
+		mkdir -p "${workshop_prefix}/lib/workshop"
+	fi
 
 	# Copy contents of current running instance to install folder
 	cp -Ra "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
