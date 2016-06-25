@@ -100,8 +100,8 @@ serve ()
     CR="$(printf '\r')"
 	callback="serve_response"
 	buffer_dir="$(tempdir)"
-	connector1="nc -v -p ${1:-9999} -l 127.0.0.1"
-	connector2="nc -v 127.0.0.1 ${1:-9999}"
+	connector2="nc -v -p ${1:-9999} -l 127.0.0.1"
+	connector1="nc -v 127.0.0.1 ${1:-9999}"
 	buffer_in=$(serve_buffer "${buffer_dir}")
 	buffer_out=$(serve_buffer "${buffer_dir}")
 	trap 'serve_abort "${buffer_dir}"' 2
