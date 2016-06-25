@@ -100,7 +100,8 @@ serve ()
     CR="$(printf '\r')"
 	callback="serve_response"
 	buffer_dir="$(tempdir)"
-	connector="nc -v -p ${1:-9999} -l 127.0.0.1"
+	connector1="nc -v -p ${1:-9999} -l 127.0.0.1"
+	connector2="nc -v 127.0.0.1 ${1:-9999}"
 	buffer_in=$(serve_buffer "${buffer_dir}")
 	buffer_out=$(serve_buffer "${buffer_dir}")
 	trap 'serve_abort "${buffer_dir}"' 2
@@ -108,7 +109,7 @@ serve ()
 	while true
 	do
 		echo "Connecting..."
-		${connector} < "${buffer_out}" > "${buffer_in}" &
+		( ${connector1} || "${connector2}") < "${buffer_out}" > "${buffer_in}" &
 		serve_parse_request > "${buffer_out}" &
 		wait
 		echo "Dropped..."
