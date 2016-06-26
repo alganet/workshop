@@ -98,7 +98,7 @@
 
 	set -- missingdep
 	workshop_server=myserver/
-	test 'Hello --fail -L myserver/missingdep.sh' = "$(. ./workshop)"
+	test 'Hello --fail -kL myserver/missingdep.sh' = "$(. ./workshop)"
 
 ## Module Dependencies Download
 
@@ -129,7 +129,7 @@
 
 	set -- somedependency
 	workshop_server=myserver/
-	test 'Hello --fail -L myserver/moduledep.sh' = "$(. ./workshop)"
+	test 'Hello --fail -kL myserver/moduledep.sh' = "$(. ./workshop)"
 
 ## Failure on invalid download
 
