@@ -62,7 +62,8 @@ install_command_prefix ()
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"
 	#!/usr/bin/env sh
 
-	workshop_lib="${workshop_prefix}/lib/workshop/"
+	workshop_lib="${workshop_prefix}/lib/workshop"
+	workshop_executable="${workshop_prefix}/lib/workshop.sh"
 	. "${workshop_prefix}/lib/workshop/workshop.sh"
 	EXECUTABLE
 
