@@ -108,10 +108,8 @@ posit_run ()
 
 		case ${_type%% *} in
 			'folder' )
-				set -x
 				mkdir -p "${_temp_dir}/${_value}"
 				cp -R "${_current_dir}/${_value%/}" "${_temp_dir}/"
-				set +x
 				;;
 		esac
 

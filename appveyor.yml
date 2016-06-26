@@ -3,33 +3,10 @@ os: Windows Server 2012 R2
 build: off
 deploy: off
 
-install:
-  # Update pacman if going to install anything
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --needed --noconfirm -Sy pacman-mirrors}"
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -Sy}"
-
-  # Install pacman dependencies
-  - cmd: call %SHELLENV% -lc "${PACMAN:+pacman --noconfirm -S $PACMAN}"
-
 test_script:
-  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; posit_shell=${posit_shell} $posit_shell lib/workshop.sh posit run doc/testing.md"
+  - cmd: call %SHELLENV% -lc "cd $APPVEYOR_BUILD_FOLDER; sh lib/workshop.sh posit run doc/matrix.md"
 
 environment:
   matrix:
-    - posit_shell: bash
-      PACMAN: bash
-      SHELLENV: C:\msys64\usr\bin\bash
-    - posit_shell: dash
-      PACMAN: dash
-      SHELLENV: C:\msys64\usr\bin\bash
-    - posit_shell: mksh
-      PACMAN: mksh
-      SHELLENV: C:\msys64\usr\bin\bash
-    - posit_shell: ksh
-      PACMAN: ksh
-      SHELLENV: C:\msys64\usr\bin\bash
-    - posit_shell: busybox sh
-      PACMAN: busybox
-      SHELLENV: C:\msys64\usr\bin\bash
-    - posit_shell: bash
-      SHELLENV: C:\MinGW\msys\1.0\bin\sh
+    - SHELLENV: C:\msys64\usr\bin\bash
+    - SHELLENV: C:\MinGW\msys\1.0\bin\sh
