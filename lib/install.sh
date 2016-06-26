@@ -56,7 +56,8 @@ install_command_prefix ()
 	# Copy contents of current running instance to install folder
 	cp -R "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
 
-	chmod 775 "${workshop_prefix}/lib/workshop"
+	chmod -R 0775 "${workshop_prefix}/lib/workshop"
+	chown -R "${USER}:staff" "${workshop_prefix}/lib/workshop"
 
 	# Create a new executable pointing to installed workshop
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"

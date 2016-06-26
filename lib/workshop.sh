@@ -17,7 +17,7 @@ workshop ()
 	if 	test -z "${workshop_unsafe:-}"
 	then
 		# Fail on errors and undefined vars. Don't expand glob patterns
-		set -eufm
+		set -euf
 	fi
 
 	# Don't expand glob patterns on zsh
