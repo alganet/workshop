@@ -25,8 +25,8 @@ install_command_help ()
 	          local            Install with PREFIX=/usr/local
 
 	Two file paths will be created:
-	  - PREFIX/workshop # The workshop executable
-	  - PREFIX/workshop # Folder with workshop libraries
+	  - PREFIX/bin/workshop # The workshop executable
+	  - PREFIX/lib/workshop # Folder with workshop libraries
 
 	INSTALL_HELP
 }
@@ -72,5 +72,5 @@ install_command_prefix ()
 
 	flash
 
-	flash "workshop installed on '${workshop_prefix}'."
+	echo "workshop installed on '${workshop_prefix}'."
 }

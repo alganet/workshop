@@ -1,10 +1,8 @@
 # Compatibility Tests
 
-Nothing fancy. Just run all tests on all possible shell combinations.
-
-This means running the suite in all shells and running the test
-processes in all combinations, including evaluating the test code
-without a new process.
+workshop is designed to run in many shells. In order to test this
+constraint, we need to setup a test matrix that runs the workshop
+test suite in all supported shells.
 
 ## Setup
 

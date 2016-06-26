@@ -62,6 +62,13 @@ serve_response ()
 			${CR}
 		MSG
 		cat "${target}"
+	else
+		cat <<-MSG
+			HTTP/1.1 404 Not Found
+			Connection: keep-alive
+			${CR}
+		MSG
+		cat "${target}"
 	fi
 
 
