@@ -53,31 +53,17 @@ serve_response ()
 				type='text/plain'
 				;;
 		esac
-
-	elif [ -d "${target}" ]; then
-		find "${target}/" -maxdepth 1 -mindepth 1 | while read -r file
-		do
-			filepath="${reldir}$(basename "${file}")"
-
-			if [ -d "${file}" ]; then
-				filepath="${filepath}/"
-			fi
-
-			echo "<li><a href='${filepath}'>${filepath}</a></li>"
-		done > "/tmp/response"
-		type='text/html'
-		target="/tmp/response"
+		length=$(wc -c < "${target}")
+		cat <<-MSG
+			HTTP/1.1 200 OK
+			Connection: keep-alive
+			Content-Type: ${type}
+			Content-Length: ${length}
+			${CR}
+		MSG
+		cat "${target}"
 	fi
 
-	length=$(wc -c < "${target}")
-	cat <<-MSG
-		HTTP/1.1 200 OK
-		Connection: keep-alive
-		Content-Type: ${type}
-		Content-Length: ${length}
-		${CR}
-	MSG
-	cat "${target}"
 
 	return
 }

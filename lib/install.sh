@@ -51,8 +51,12 @@ install_command_prefix ()
 		mkdir -p "${workshop_prefix}/lib/workshop"
 	fi
 
+	flash "Copying files..."
+
 	# Copy contents of current running instance to install folder
 	cp -R "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
+
+	chmod 775 "${workshop_prefix}/lib/workshop"
 
 	# Create a new executable pointing to installed workshop
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"
@@ -62,6 +66,8 @@ install_command_prefix ()
 	EXECUTABLE
 
 	chmod +x "${workshop_prefix}/bin/workshop"
+
+	flash
 
 	flash "workshop installed on '${workshop_prefix}'."
 }
