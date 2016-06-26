@@ -1,3 +1,4 @@
+sudo: required
 script:
   - sh lib/workshop.sh posit run doc/matrix.md
 matrix:
