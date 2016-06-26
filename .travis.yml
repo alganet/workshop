@@ -1,6 +1,6 @@
 sudo: required
 script:
-  - sh lib/workshop.sh posit run doc/matrix.md
+  - sudo sh lib/workshop.sh posit run doc/matrix.md
 matrix:
   include:
     - os:  osx

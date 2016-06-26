@@ -28,8 +28,8 @@ accordingly using `environment.sh` files that you can tweak:
 ### OS X Environment
 
 [~]:file:osx-environment.sh
-	BREW='dash bash ksh mksh zsh busybox'
-	SHELLS='dash,bash,ksh,mksh,zsh,busybox sh'
+	BREW='dash bash ksh mksh zsh'
+	SHELLS='dash,bash,ksh,mksh,zsh'
 
 	brew update
 	brew install $BREW
