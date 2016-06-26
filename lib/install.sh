@@ -62,7 +62,9 @@ install_command_prefix ()
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"
 	#!/usr/bin/env sh
 
-	. "${workshop_prefix}/lib/workshop/workshop.sh"
+	workshop_lib="${workshop_prefix}/lib/workshop" \
+	workshop_executable="${workshop_prefix}/bin/workshop" \
+		. "${workshop_prefix}/lib/workshop/workshop.sh"
 	EXECUTABLE
 
 	chmod +x "${workshop_prefix}/bin/workshop"
