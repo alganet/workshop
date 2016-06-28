@@ -139,13 +139,13 @@ nav_keypress ()
 	IFS=
 
 	case ${1:-nop}_${2:-} in
-		left_ | n_ )
+		left_ )
 			if test $nav_focus -gt 1
 			then
 				nav_focus=$((nav_focus - 1))
 			fi
 			;;
-		right_ | p_ )
+		right_ )
 			if test $nav_focus -lt $nav_max_focus
 			then
 				nav_focus=$((nav_focus + 1))
@@ -185,6 +185,7 @@ nav_keypress ()
 			fi
 			;;
 		* )
+			${nav_keypress:-:}
 			;;
 	esac
 
@@ -231,7 +232,7 @@ nav_frame ()
 			* )
 				if test "${nav_meta}" = 0
 				then
-					printf '%s ' ${nav_display}
+					printf "${nav_display} "
 				fi
 				;;
 		esac
@@ -430,7 +431,7 @@ nav_keyloop ()
 nav_push_state ()
 {
 	printf "${nav_sc}"
-	printf ' \033[1m'${nav_char}'\033[0m'
+	printf ' \033[1m'${nav_start}'\033[0m'
 	printf "${nav_rc}"
 	nav_focus=1
 	nav_contents="${1:-}"
@@ -507,8 +508,7 @@ nav_exit ()
 
 nav_open ()
 {
-	nav_char='~'
-	printf "\033[?25l~ " # Hide Blinking Cursor
+	printf "\033[?25l\r " # Hide Blinking Cursor
 	tput sc 2>/dev/null  || printf '\033[s'
 	nav_cols="$(stty size | cut -d ' ' -f2)"
 	nav_progress_total="$(expr $nav_cols / 19)"
@@ -537,8 +537,8 @@ nav_open ()
 	nav_progress_
 	nav_input="${1:-[ About nav ] [ Exit ]}"
 	nav_stack=0
-	nav_start="${nav_char}"
-	nav_end=''
+	nav_start="${nav_start:-}"
+	nav_end="${nav_end:-}"
 	tput smcup > /dev/null 2>/dev/null  || printf '\033[47h' > /dev/null
 	nav_progress_
 	nav_cursor_up="$(tput cud 1 2>/dev/null  || printf '\033[1A')"

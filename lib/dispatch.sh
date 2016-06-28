@@ -27,15 +27,21 @@ dispatch ()
 			set -- "${_long_value}" "${@:-}"
 		fi
 
-		_target="${_ns}_option_${_long}"
+		_target="${_ns}${dispatch_option:-_option_}${_long}"
 	elif test "${_arg}" = "-${_short}"
 	then
-		_target="${_ns}_option_${_short}"
-	else
-		_target="${_ns}_command_${_long}"
+		_target="${_ns}_${dispatch_option:-option}_${_short}"
+	elif test -z "${dispatch_opts_only:-}"
+	then
+		_target="${_ns}_${dispatch_command:-command}_${_long}"
 	fi
 
-	set -- "${_target}" "${@:-}"
+	set -- "${_target:-:}" "${@:-}"
 
-	"${@:-}"
+	if test -z "${dispatch_name:-}"
+	then
+		"${@:-}"
+	else
+		echo "${@:-}"
+	fi
 }

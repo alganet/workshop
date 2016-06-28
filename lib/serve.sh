@@ -79,9 +79,10 @@ serve_response ()
 serve_parse_request ()
 {
 	while test -e "${buffer_in}" &&
-		 read -r REQUEST_METHOD REQUEST_URI SERVER_PROTOCOL
+		 read -r -t1 REQUEST_METHOD REQUEST_URI SERVER_PROTOCOL
 	do
-		if test "${SERVER_PROTOCOL:-}" = "HTTP/1.1${CR}"
+		if test "${SERVER_PROTOCOL:-}" = "HTTP/1.1${CR}" ||
+			test "${SERVER_PROTOCOL:-}" = "HTTP/1.1"
 		then
 			"${callback}"
 		fi

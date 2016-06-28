@@ -104,6 +104,8 @@ resolve ()
 		workshop_detached=1
 	fi
 
+	_resolveifs="${IFS}"
+	IFS=' '
 	# Don't stop until all dependencies are met
 	while true ; do for _dependency in ${_dependencies}
 	do
@@ -240,6 +242,7 @@ resolve ()
 		# Add loaded module to list of dependencies met
 		_modules="${_modules} ${_dependency} "
 	done ; done
+	IFS="${_resolveifs}"
 
 	# If not in run once mode, remove temporary files.
 	if test ! -z "${_temp_dir:-}" && test -z "${workshop_detached:-}"

@@ -56,8 +56,23 @@ install_command_prefix ()
 	# Copy contents of current running instance to install folder
 	cp -R "${workshop_lib}/." "${workshop_prefix}/lib/workshop"
 
+	install_user="${USER:-$(whoami)}"
+
+	for possible_group in $(groups)
+	do
+		if  test "${possible_group}" = 'sudo' ||
+			test "${possible_group}" = 'staff' ||
+			test "${possible_group}" = 'admin' ||
+			test "${possible_group}" = "${install_user}"
+		then
+			install_group="${possible_group}"
+			break
+		fi
+	done
+
 	chmod -R 0775 "${workshop_prefix}/lib/workshop"
-	chown -R "${USER}:staff" "${workshop_prefix}/lib/workshop"
+	chown -R "${install_user}:${install_group}" \
+		"${workshop_prefix}/lib/workshop"
 
 	# Create a new executable pointing to installed workshop
 	cat <<-EXECUTABLE > "${workshop_prefix}/bin/workshop"
